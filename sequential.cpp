@@ -1,7 +1,6 @@
 /**
  * @author Kaiqi Liang (23344153)
- * @author Briana (23344153)
- * @date 2023-08-30
+ * @author Briana Davies-Morrell (22734723)
  */
 #include <algorithm>
 #include <ctime>

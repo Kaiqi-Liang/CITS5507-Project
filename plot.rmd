@@ -1,0 +1,20 @@
+---
+title: "CITS5507 Project1 Report"
+
+graphics: yes
+author: Kaiqi Liang (23344153), Briana Davies-Morrell (22734723)
+date: "Semester 2, 2023"
+
+output:
+  html_document:
+    number_sections: true
+---
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(
+    data.frame(num_threads = c(1, 2, 4), time = c(12.2, 10, 8)),
+    aes(x = num_threads, y = time)) +
+    labs(x = "Number of Threads", y = "Time (s)") +
+    geom_point() +
+    geom_smooth()
+```
