@@ -9,12 +9,65 @@ output:
   html_document:
     number_sections: true
 ---
+
+Fix every but change threads 
 ```{r, message=FALSE, warning=FALSE}
 library(ggplot2)
 ggplot(
     data.frame(num_threads = c(1, 2, 4), time = c(12.2, 10, 8)),
     aes(x = num_threads, y = time)) +
     labs(x = "Number of Threads", y = "Time (s)") +
+    geom_point() +
+    geom_smooth()
+```
+
+Fix threads but change fish 
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+ggplot(
+    data = data.frame(fish = c(1, 2, 4), thread_1 = c(12.2, 10, 8), thread_2 = c(8.0, 3.0, 4.0)),
+    aes(x = fish)) +
+    geom_smooth(aes(y = thread_1, color = "1 Thread")) + 
+    geom_smooth(aes(y = thread_2, color = "2 Thread")) + 
+    geom_point(aes(y = thread_1)) + 
+    geom_point(aes(y = thread_2)) +
+    labs(x = "Number of Fish", y = "Time (s)", color = "Number of Threads") + 
+    scale_color_manual(values = c("1 Thread" = "darkred", "2 Thread" = "steelblue")) 
+```
+
+Fix fish, change niumbr of threads and scheudling type 
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+ggplot(
+    data = data.frame(
+      threads = c(1, 2, 4), 
+      static = c(12.2, 10, 8), 
+      dynamic = c(8.0, 5.0, 4.0),
+      guided = c(4.0, 3.0, 2.0),
+      runtime = c(1.0, 0.5, 0.3)),
+    aes(x = threads)) +
+    geom_smooth(aes(y = static, color = "static")) + 
+    geom_smooth(aes(y = dynamic, color = "dynamic")) + 
+    geom_smooth(aes(y = guided, color = "guided")) + 
+    geom_smooth(aes(y = runtime, color = "runtime")) + 
+    geom_point(aes(y = static)) + 
+    geom_point(aes(y = dynamic)) + 
+    geom_point(aes(y = guided)) + 
+    geom_point(aes(y = runtime)) + 
+    labs(x = "Number of Fish", y = "Time (s)", color = "Scheduling Type") + 
+    scale_color_manual(values = c("static" = "darkred", "dynamic" = "steelblue", "guided" = "magenta", runtime = "darkgreen")) 
+```
+
+
+Fix everything but change number of rounds  
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(
+    data.frame(num_rounds = c(1, 2, 4), time = c(12.2, 10, 8)),
+    aes(x = num_rounds, y = time)) +
+    labs(x = "Number of Rounds", y = "Time (s)") +
     geom_point() +
     geom_smooth()
 ```

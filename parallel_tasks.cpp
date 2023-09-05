@@ -8,6 +8,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <omp.h>
 
 /*
 ----------------------------------------
@@ -82,21 +83,32 @@ int main() {
 	std::vector<Fish> school(NUM_OF_FISH);
 	for (std::size_t i = 0; i < NUM_OF_STEPS; i++) {
 		double max_difference = 0;
-		for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
-			max_difference = std::max(max_difference, school[j].difference());
-		}
-
-		for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
-			school[j].action(i, max_difference);
-		}
-
 		double numerator = 0;
 		double denominator = 0;
-		for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
-			numerator += school[j].distance_ * school[j].weight_;
-			denominator += school[j].distance_;
-		}
+		#pragma omp parallel
+		{
+			#pragma omp for reduction(max: max_difference)
+			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
+				max_difference = std::max(max_difference, school[j].difference());
+			}
 
+			#pragma omp for
+			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
+				school[j].action(i, max_difference);
+			}
+
+			#pragma omp single
+			{
+				#pragma omp task
+				for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
+					numerator += school[j].distance_ * school[j].weight_;
+				}
+				#pragma omp task
+				for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
+					denominator += school[j].distance_;
+				}
+			}
+		}
 		double barycentre = numerator / denominator;
 		// std::cout << barycentre << std::endl;
 	}
@@ -106,6 +118,6 @@ int main() {
 	std::cout << end << std::endl;
 	double time_spent = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 	std::cout << "time spent:" << std::fixed << std::setw(10)
-	          << std::setprecision(6) << time_spent << std::endl;
+			  << std::setprecision(6) << time_spent << std::endl;
 	return 0;
 }
