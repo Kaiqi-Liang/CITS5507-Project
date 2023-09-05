@@ -19,7 +19,10 @@ int main() {
 	clock_t begin = std::clock();
 
 	std::vector<Fish> school(NUM_OF_FISH);
+
+#ifdef SEQUENTIAL
 	sequential(school);
+#endif
 
 #ifdef PARALLEL_FOR
 	parallel_for(school);
