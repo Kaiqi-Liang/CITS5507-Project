@@ -12,6 +12,7 @@
 #ifdef PARALLEL
 #include "parallel_for.hpp"
 #include "parallel_tasks.hpp"
+#include "parallel_task_per_fish.hpp"
 #include "parallel_partition.hpp"
 #endif
 
@@ -31,6 +32,10 @@ int main() {
 
 #ifdef PARALLEL_TASKS
 	parallel_tasks(school);
+#endif
+
+#ifdef PARALLEL_TASK_PER_FISH
+	parallel_task_per_fish(school);
 #endif
 
 #ifdef PARALLEL_PARTITION
