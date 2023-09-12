@@ -21,12 +21,13 @@ constexpr double INITIAL_FOOD = 1;
 ----------------------------------------
 */
 
-double random_real_number(double min, double max) {
+namespace {
 	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution distribution(min, max);
-	return distribution(gen);
-}
+	double random_real_number(double min, double max) {
+		std::uniform_real_distribution distribution(min, max);
+		return distribution(rd);
+	}
+} // namespace
 
 class Fish {
 public:

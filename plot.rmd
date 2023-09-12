@@ -14,7 +14,7 @@ output:
 library(ggplot2)
 ```
 
-Fix everything but threads
+Fix everything but number of threads
 ```{r, message=FALSE, warning=FALSE}
 ggplot(
     data.frame(num_threads = c(1, 2, 4), time = c(12.2, 10, 8)),
@@ -81,3 +81,5 @@ ggplot(
     "guided" = "magenta",
     "runtime" = "darkgreen"))
 ```
+
+Fix everything but different implementation of tasks vs partition and simple parallel for
