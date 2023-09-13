@@ -22,24 +22,29 @@ int main() {
 #ifdef SEQUENTIAL
 	clock_t begin = std::clock();
 	sequential(school);
+	std::cout << "sequential\n";
 #else
 	double begin = omp_get_wtime();
 #endif
 
 #ifdef PARALLEL_FOR
 	parallel_for(school);
+	std::cout << "parallel_for\n";
 #endif
 
 #ifdef PARALLEL_TASKS
 	parallel_tasks(school);
+	std::cout << "parallel_tasks\n";
 #endif
 
 #ifdef PARALLEL_TASK_PER_FISH
 	parallel_task_per_fish(school);
+	std::cout << "parallel_task_per_fish\n";
 #endif
 
 #ifdef PARALLEL_PARTITION
 	parallel_partition(school);
+	std::cout << "parallel_partition\n";
 #endif
 
 #ifdef PARALLEL
