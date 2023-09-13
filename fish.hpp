@@ -11,10 +11,10 @@ Default Hyper-parameters
 ----------------------------------------
 */
 
-constexpr std::size_t NUM_OF_STEPS = 100000;
-constexpr std::size_t NUM_OF_FISH = 100000;
+constexpr std::size_t NUM_OF_STEPS = 50000;
+constexpr std::size_t NUM_OF_FISH = 500000;
 constexpr double SQUARE = 100;
-constexpr double INITIAL_WEIGHT = 50000;
+constexpr double INITIAL_WEIGHT = 100000;
 constexpr double INITIAL_FOOD = 1;
 
 /*
@@ -23,9 +23,10 @@ constexpr double INITIAL_FOOD = 1;
 
 namespace {
 	std::random_device rd;
+	std::mt19937 gen(rd());
 	double random_real_number(double min, double max) {
 		std::uniform_real_distribution distribution(min, max);
-		return distribution(rd);
+		return distribution(gen);
 	}
 } // namespace
 
