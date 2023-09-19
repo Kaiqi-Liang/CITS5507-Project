@@ -15,12 +15,25 @@ library(ggplot2)
 ```
 
 # Experimenting with Number of Threads 
-Fix everything but number of threads - need to do 2 and 1 
+Fix everything but number of threads
+
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
-    data.frame(num_threads = c(0, 2, 4, 8, 16), time = c(2780.588561, 3471.353496, 2925.219894, 2929.350958, 3000.694720)),
+    data.frame(
+      num_threads = seq(7),
+      time = c(
+        2780.588561,
+        3220.587380,
+        3471.353496,
+        2925.219894,
+        2944.861335,
+        2929.350958,
+        3000.694720)),
     aes(x = num_threads, y = time)) +
     labs(x = "Number of Threads", y = "Time (s)") +
+    scale_x_continuous(
+      breaks = seq(7),
+      labels = c("Sequential", 1, 2, 4, 6, 8, 16)) +
     geom_point() +
     geom_smooth()
 ```
@@ -102,17 +115,17 @@ ggplot(
 
 
 # Kaiqi 
-Fix schedule & threads, change chunk size 
-Fix everything but number of threads for different scheduling types
+Fix number of threads to be 4, change chunk size and scheduling types
+
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
-    threads = c(1, 2, 4),
-    static = c(12.2, 10, 8),
-    dynamic = c(8.0, 5.0, 4.0),
-    guided = c(4.0, 3.0, 2.0),
-    runtime = c(1.0, 0.5, 0.3)),
-  aes(x = threads)) +
+    chunk_size = c(1, 2, 3, 4),
+    static = c(3000, 2784.864581, 3000, 2918.142244),
+    dynamic = c(3000, 3073.691588, 3000, 2982.671884),
+    guided = c(3000, 3000, 3000, 2946.995764),
+    runtime = 3000),
+  aes(x = chunk_size)) +
   geom_smooth(aes(y = static, color = "static")) +
   geom_smooth(aes(y = dynamic, color = "dynamic")) +
   geom_smooth(aes(y = guided, color = "guided")) +
@@ -121,9 +134,10 @@ ggplot(
   geom_point(aes(y = dynamic)) +
   geom_point(aes(y = guided)) +
   geom_point(aes(y = runtime)) +
-  labs(x = "Number of Fish",
+  labs(x = "Chunk Size",
     y = "Time (s)",
     color = "Scheduling Type") +
+  scale_x_continuous(labels = c(1, 10, 100, 10000)) +
   scale_color_manual(values = c(
     "static" = "darkred",
     "dynamic" = "steelblue",
