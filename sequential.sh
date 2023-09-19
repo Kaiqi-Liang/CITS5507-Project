@@ -8,6 +8,4 @@
 
 g++ -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DSEQUENTIAL main.cpp -o sequential
 
-export OMP_NUM_THREADS=16
-
 srun ./sequential
