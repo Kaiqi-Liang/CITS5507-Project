@@ -8,6 +8,6 @@
 
 g++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DPARALLEL_TASK_PER_FISH main.cpp -o parallel_task_per_fish
 
-export OMP_NUM_THREADS=16
+export OMP_NUM_THREADS=4
 
 srun ./parallel_task_per_fish

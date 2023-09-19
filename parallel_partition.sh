@@ -8,6 +8,6 @@
 
 g++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DPARALLEL_PARTITION main.cpp -o parallel_partition
 
-export OMP_NUM_THREADS=16
+export OMP_NUM_THREADS=4
 
 srun ./parallel_partition
