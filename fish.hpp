@@ -80,4 +80,5 @@ private:
 		return std::sqrt(std::pow(x_, 2) + std::pow(y_, 2));
 	}
 };
-#endif
+
+#endif // FISH_HPP
