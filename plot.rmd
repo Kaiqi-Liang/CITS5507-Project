@@ -17,7 +17,7 @@ library(ggplot2)
 Fix everything but number of threads
 ```{r, message=FALSE, warning=FALSE}
 ggplot(
-    data.frame(num_threads = c(4, 8, 16), time = c(2925.219894, 2929.350958, 3000.694720)),
+    data.frame(num_threads = c(0, 4, 8, 16), time = c(2780.588561, 2925.219894, 2929.350958, 3000.694720)),
     aes(x = num_threads, y = time)) +
     labs(x = "Number of Threads", y = "Time (s)") +
     geom_point() +
