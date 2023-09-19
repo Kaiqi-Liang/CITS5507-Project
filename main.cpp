@@ -5,55 +5,46 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <omp.h>
 #include <vector>
 
 #include "fish.hpp"
+
+#ifdef SEQUENTIAL
 #include "sequential.hpp"
-#ifdef PARALLEL
+#elif PARALLEL_FOR
 #include "parallel_for.hpp"
+#elif PARALLEL_TASKS
 #include "parallel_tasks.hpp"
+#elif PARALLEL_TASK_PER_FISH
 #include "parallel_task_per_fish.hpp"
+#elif PARALLEL_PARTITION
 #include "parallel_partition.hpp"
 #endif
 
 int main() {
 	std::vector<Fish> school(NUM_OF_FISH);
+	double begin = omp_get_wtime();
 
 #ifdef SEQUENTIAL
-	clock_t begin = std::clock();
 	sequential(school);
 	std::cout << "sequential\n";
-#else
-	double begin = omp_get_wtime();
-#endif
-
-#ifdef PARALLEL_FOR
+#elif PARALLEL_FOR
 	parallel_for(school);
 	std::cout << "parallel_for\n";
-#endif
-
-#ifdef PARALLEL_TASKS
+#elif PARALLEL_TASKS
 	parallel_tasks(school);
 	std::cout << "parallel_tasks\n";
-#endif
-
-#ifdef PARALLEL_TASK_PER_FISH
+#elif PARALLEL_TASK_PER_FISH
 	parallel_task_per_fish(school);
 	std::cout << "parallel_task_per_fish\n";
-#endif
-
-#ifdef PARALLEL_PARTITION
+#elif PARALLEL_PARTITION
 	parallel_partition(school);
 	std::cout << "parallel_partition\n";
 #endif
 
-#ifdef PARALLEL
 	double end = omp_get_wtime();
 	double time_spent = end - begin;
-#else
-	clock_t end = std::clock();
-	double time_spent = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-#endif
 	std::cout << "time spent:" << std::fixed << std::setw(10)
 	          << std::setprecision(6) << time_spent << " seconds\n";
 	return 0;
