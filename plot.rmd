@@ -1,5 +1,5 @@
 ---
-title: "CITS5507 Project1 Report"
+title: "CITS5507 Project 1: Parallel implementation of search based on Fish School Behaviour"
 
 graphics: yes
 author: Kaiqi Liang (23344153), Briana Davies-Morrell (22734723)
@@ -10,22 +10,67 @@ output:
     number_sections: true
 ---
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 library(ggplot2)
 ```
 
-Fix everything but number of threads
-```{r, message=FALSE, warning=FALSE}
+# Experimenting with Number of Threads 
+Fix everything but number of threads - need to do 2 and 1 
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
-    data.frame(num_threads = c(0, 4, 8, 16), time = c(2780.588561, 2925.219894, 2929.350958, 3000.694720)),
+    data.frame(num_threads = c(0, 2, 4, 8, 16), time = c(2780.588561, 3471.353496, 2925.219894, 2929.350958, 3000.694720)),
     aes(x = num_threads, y = time)) +
     labs(x = "Number of Threads", y = "Time (s)") +
     geom_point() +
     geom_smooth()
 ```
 
-Fix everything but number of rounds
-```{r, message=FALSE, warning=FALSE}
+
+# Experimenting with Number of Fish & Iterations 
+
+default, no scheduling 
+set at 4 threads 
+change iterations AND fish 
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+
+ggplot(
+  data = data.frame(
+    num_fish =  c(200000, 400000, 600000, 800000, 1000000),
+    iter_20000 = c(1,1,1,482.203047, 653.402037),
+    iter_40000 = c(1,1,1,1,1),
+    iter_60000 = c(1,1,1,1,1),
+    iter_80000 = c(1,1,1,1,1),
+    iter_100000 = c(1, 1, 1, 1, 1)),
+  aes(x = num_fish)) +
+  geom_smooth(aes(y = iter_20000, color = "20000")) +
+  geom_smooth(aes(y = iter_40000, color = "40000")) +
+  geom_smooth(aes(y = iter_60000, color = "60000")) +
+  geom_smooth(aes(y = iter_80000, color = "80000")) +
+  geom_smooth(aes(y = iter_100000, color = "100000")) +
+
+  geom_point(aes(y = iter_20000)) +
+  geom_point(aes(y = iter_40000)) +
+  geom_point(aes(y = iter_60000)) +
+  geom_point(aes(y = iter_80000)) +
+  geom_point(aes(y = iter_100000)) +
+  labs(x = "Number of Fish",
+    y = "Time (s)",
+    color = "Number of Iterations") +
+  scale_color_manual(values = c(
+    "20000" = "darkred",
+    "40000" = "steelblue",
+    "60000" = "magenta",
+    "80000" = "darkgreen",
+    "100000" = "pink4"))
+```
+# Experimenting with Number of Iterations 
+
+# Briana
+Fix everything but number of steps . e,g, for four threads
+2,4,6,8,10
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data.frame(num_rounds = c(1, 2, 4), time = c(12.2, 10, 8)),
   aes(x = num_rounds, y = time)) +
@@ -34,8 +79,9 @@ ggplot(
   geom_smooth()
 ```
 
+# Briana 
 Fix everything but fish
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
     fish = c(1, 2, 4),
@@ -54,8 +100,11 @@ ggplot(
     "2 Thread" = "steelblue"))
 ```
 
+
+# Kaiqi 
+Fix schedule & threads, change chunk size 
 Fix everything but number of threads for different scheduling types
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
     threads = c(1, 2, 4),
