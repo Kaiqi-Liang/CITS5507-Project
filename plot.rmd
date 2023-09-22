@@ -75,12 +75,11 @@ ggplot(
 
 ## Hyperparameters: Number of Fish & Iterations
 
-In the second experiment, we assessed the impact of varying two critical hyperparameters, the number of fish and the number of iterations, on the execution time of the parallel FSB algorithm. The number of threads fixed at 4 and a static scheduling strategy was employed. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiement. Similar to the first experiment, caching was not employed.
+In the second experiment, we assessed the impact of varying two critical hyperparameters, the number of fish and the number of iterations, on the execution time of the parallel FSB algorithm. The number of threads fixed at 4 and a static scheduling strategy was employed. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiment Similar to the first experiment, caching was not employed.
 
-The graph below visualizes the execution time over a combination of different number of fishes and iterations, with the x-axis represent the number of fishes and each line representing the number of iterations ran in a given experiment. As evident from the graph, increasing both the number of fish and the number of iterations leds to an exponential growth in execution time. This behavior is expected, as a larger population of fish and more iterations require more computation, resulting in longer execution times.
+The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm. Increasing the number of fish, for a set number of iterations, results in a linear increase in execution time whereas increasing the number of iterations, for a set number of fish, results in a parabolic increase in execution time. This behavior is expected, as a larger population of fish and more iterations require more computation, resulting in longer execution times.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-
 ggplot(
   data = data.frame(
     num_fish =  c(200000, 400000, 600000, 800000, 1000000),
@@ -90,11 +89,11 @@ ggplot(
     iter_80000 = c(471.402103,944.524666,1397.776130,1863.592248,2350.380621),
     iter_100000 = c(586.554482, 1167.285182, 1771.424057,2363.592248, 2925.219894)),
   aes(x = num_fish)) +
-  geom_smooth(aes(y = iter_20000, color = "20000")) +
-  geom_smooth(aes(y = iter_40000, color = "40000")) +
-  geom_smooth(aes(y = iter_60000, color = "60000")) +
-  geom_smooth(aes(y = iter_80000, color = "80000")) +
-  geom_smooth(aes(y = iter_100000, color = "100000")) +
+  geom_smooth(aes(y = iter_20000, color = "20000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm", se = FALSE) +
   geom_point(aes(y = iter_20000)) +
   geom_point(aes(y = iter_40000)) +
   geom_point(aes(y = iter_60000)) +
