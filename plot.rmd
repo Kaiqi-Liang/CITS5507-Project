@@ -35,7 +35,7 @@ The parallel implementation was developed using OpenMP. We explored the followin
 
 3. Thread Scheduling
 
-4. OMP Directives 
+4. Parallel Implementations using different OMP Directives
 
 
 # Experimental Results
@@ -50,22 +50,23 @@ From the results, provided below, it was observed that the sequential implementa
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
     data.frame(
-      num_threads = c(1, 2, 4, 6, 8, 16),
+      num_threads = c(1, 2, 4, 5, 6, 8, 16),
       parallel = c(
         3220.587380,
         3471.353496,
         2925.219894,
         2944.861335,
+        2977.993479,
         2929.350958,
         3000.694720),
       sequential = 2780.588561),
     aes(x = num_threads)) +
-    ggtitle("Execution Time vs Number of Threads") +
-    labs(x = "Number of Threads",
+    labs(title = "Execution Time vs Number of Threads",
+      x = "Number of Threads",
       y = "Time (s)",
       linetype = "Parallel / Sequential") +
     geom_smooth(aes(y = sequential, linetype = "sequential")) +
-    geom_smooth(aes(y = parallel, linetype = "parallel")) +
+    geom_line(aes(y = parallel, linetype = "parallel")) +
     geom_point(aes(y = parallel)) +
     scale_y_continuous(breaks = c(
       seq(2900, 3500, by = 100), 2780)) +
@@ -105,14 +106,24 @@ ggplot(
   geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
   geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
   geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm",
+    se = FALSE) +
   geom_point(aes(y = iter_20000)) +
   geom_point(aes(y = iter_40000)) +
   geom_point(aes(y = iter_60000)) +
   geom_point(aes(y = iter_80000)) +
   geom_point(aes(y = iter_100000)) +
-  ggtitle("Execution Time vs Hyperparameters") +
-  labs(x = "Number of Fish",
+  geom_smooth(aes(y = c(117.350819,
+    466.925614,
+    1050.975947,
+    1863.592248,
+    2925.219894)),
+    method = "lm",
+    formula = y ~ poly(x, 2),
+    linetype = "dotted",
+    se = FALSE) +
+  labs(title = "Execution Time vs Hyperparameters",
+    x = "Number of Fish",
     y = "Time (s)",
     color = "Number of Iterations") +
   scale_color_manual(values = c(
@@ -145,8 +156,8 @@ ggplot(
   geom_point(aes(y = static)) +
   geom_point(aes(y = dynamic)) +
   geom_point(aes(y = guided)) +
-  ggtitle("Execution Time vs Scheduling Strategies") +
-  labs(x = "Chunk Size",
+  labs(title = "Execution Time vs Scheduling Strategies",
+    x = "Chunk Size",
     y = "Time (s)",
     color = "Scheduling Type") +
   scale_x_continuous(labels = c(1, 10, 100, 10000)) +
@@ -161,16 +172,25 @@ ggplot(
 ## OMP Directives 
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
-  data=
-    data.frame(
-      OMP_Directive = c("OMP For", "OMP For (Sorted)", "OMP Task", "OMP Task ?"),
-      Time = c(10.5, 12.2, 8.7, 14.1)), aes(x = OMP_Directive, y = Time)) +
-  geom_bar(stat = "identity", fill = "dodgerblue4") +
-  labs(
-    title = "Execution Time for Different OMP Directives",
-    x = "OMP Directives",
-    y = "Time (s)"
-  ) 
+  data = data.frame(
+    omp_directive = c("OMP For",
+      "OMP For Partition",
+      "OMP Task Per Fish",
+      "OMP Tasks"),
+    time = c(295.652146,
+      885.287894,
+      4877.38059,
+      305.464913),
+    colour_group = c(rep("OMP For", 2), rep("OMP Task", 2))),
+    aes(x = omp_directive, y = time, fill = colour_group)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Execution Time for Different Implementations",
+    x = "Implementations",
+    y = "Time (s)",
+    fill = "OMP Directives"
+  )
 ```
+
+## Cache Behaviour
