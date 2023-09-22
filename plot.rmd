@@ -35,15 +35,16 @@ The parallel implementation was developed using OpenMP. We explored the followin
 
 3. Thread Scheduling
 
-4. Cache Behavior
+4. OMP Directives 
 
 
 # Experimental Results
 
 ## Number of Threads
-In our first experiment we fixed the hyperparameters and scheduling strategy and ran the algorithm for a variety of thread numbers. The number of fish was fixed to xyz, the number of iterations was fixed to xyz, and the scheduling type fixed to static. This was because ..... No caching was employed as this was not the focus of this experiment  
 
-It was observed that the sequential implementation had a faster execution time, potentially due to not having any thread managment overhead. Some speedup occured in increasing the thread number from 2 to 4, but beyond 4 the speedup plateaued and decreased slightly, likely due to increased overhead from thread management.
+In our first experiment, we aimed to assess the impact of varying the number of threads on the parallelized FSB algorithm's performance while keeping hyperparameters and thread scheduling constant. Specifically, we maintained the number of fish at 1,000,000, the number of iterations at 100,000, and used a static scheduling strategy. We did not employ caching since it was not the focus of this experiment.
+
+From the results, provided below, it was observed that the sequential implementation had the fastest execution time, potentially due to the absence of thread management overhead. Some speedup was achieved by increasing the thread count from 2 to 4, but beyond 4 threads, the speedup plateaued with the execution time remaining relatively stable, indicating diminishing returns in terms of parallelization efficiency. This decline in performance can be attributed to increased overhead from thread management.
 
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
@@ -74,8 +75,9 @@ ggplot(
 
 ## Hyperparameters: Number of Fish & Iterations
 
-In our second experiment we fixed the number of threads and scheduling strategy and ran the algorithm for a variety of hyperparameter values. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiement. The scheduling type fixed to static and no caching was employed as this was not the focus of this experiment.  
+In the second experiment, we assessed the impact of varying two critical hyperparameters, the number of fish and the number of iterations, on the execution time of the parallel FSB algorithm. The number of threads fixed at 4 and a static scheduling strategy was employed. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiement. Similar to the first experiment, caching was not employed.
 
+The graph below visualizes the execution time over a combination of different number of fishes and iterations, with the x-axis represent the number of fishes and each line representing the number of iterations ran in a given experiment. As evident from the graph, increasing both the number of fish and the number of iterations leds to an exponential growth in execution time. This behavior is expected, as a larger population of fish and more iterations require more computation, resulting in longer execution times.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 
@@ -112,9 +114,7 @@ ggplot(
 
 ## Thread Scheduling
 
-In our third experiment we fixed the number of threads and hyperparameters and ran the algorithm the different scheduling strategies of static, dynamic, guided, and runtime. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiment. The hyperparameters were fixed to xyz and xyz because xyz.
-
-** was chunk size also changed?
+In the third experiment, we investigated the impact of different thread scheduling strategies (static, dynamic, guided, and runtime) on the execution time of the parallelized FSB algorithm. The number of threads was fixed at 4, and the hyperparameters of number of fish and iterations were also kept constant at 1,000,000 and 100,000 respectively. 
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
