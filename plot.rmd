@@ -15,7 +15,7 @@ library(ggplot2)
 ```
 
 # Introduction
-Fish School Behavior (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize a simple version of the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies. 
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize a simple version of the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies.
 
 # Experimental Setup
 
@@ -68,9 +68,9 @@ ggplot(
     geom_smooth(aes(y = parallel, linetype = "parallel")) +
     geom_point(aes(y = parallel)) +
     scale_y_continuous(breaks = c(
-      setdiff(seq(2700, 3500, by = 100), 2800),
-      2780)) +
-    scale_x_continuous(breaks = 1:16)
+      seq(2900, 3500, by = 100), 2780)) +
+    scale_x_continuous(breaks = 1:16) +
+    theme(panel.grid.minor = element_blank())
 ```
 
 ## Hyperparameters: Number of Fish & Iterations
@@ -83,11 +83,23 @@ The graph below visualizes the relationship between the number of fish and the e
 ggplot(
   data = data.frame(
     num_fish =  c(200000, 400000, 600000, 800000, 1000000),
-    iter_20000 = c(117.350819,237.082449,397.935612,482.203047, 653.402037),
-    iter_40000 = c(234.463991,466.925614,700.021926,936.720754,1177.662832),
-    iter_60000 = c(353.012268,701.901361,1050.975947,1418.876797,1777.164701),
-    iter_80000 = c(471.402103,944.524666,1397.776130,1863.592248,2350.380621),
-    iter_100000 = c(586.554482, 1167.285182, 1771.424057,2363.592248, 2925.219894)),
+    iter_20000 = c(117.350819, 237.082449, 397.935612, 482.203047, 653.402037),
+    iter_40000 = c(234.463991, 466.925614, 700.021926, 936.720754, 1177.662832),
+    iter_60000 = c(353.012268,
+      701.901361,
+      1050.975947,
+      1418.876797,
+      1777.164701),
+    iter_80000 = c(471.402103,
+      944.524666,
+      1397.776130,
+      1863.592248,
+      2350.380621),
+    iter_100000 = c(586.554482,
+      1167.285182,
+      1771.424057,
+      2363.592248,
+      2925.219894)),
   aes(x = num_fish)) +
   geom_smooth(aes(y = iter_20000, color = "20000"), method = "lm", se = FALSE) +
   geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
@@ -115,6 +127,8 @@ ggplot(
 
 In the third experiment, we investigated the impact of different thread scheduling strategies (static, dynamic, guided, and runtime) on the execution time of the parallelized FSB algorithm. The number of threads was fixed at 4, and the hyperparameters of number of fish and iterations were also kept constant at 1,000,000 and 100,000 respectively. 
 
+The runtime scheduling has no chunk size as it is constantly being adjusted during runtime so in the graph it is kept as a straight line. As the time limit on Setonix is 1 hour, anything over 3600 seconds were run with fewer number of steps and scale the time back to the same as every other experiment, based on the previous experiments on Execution Time vs Hyperparameters we can conclude that execution time grows linerally with the nubmer of steps, so this estimate is accurate.
+
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
@@ -127,7 +141,7 @@ ggplot(
   geom_smooth(aes(y = static, color = "static")) +
   geom_smooth(aes(y = dynamic, color = "dynamic")) +
   geom_smooth(aes(y = guided, color = "guided")) +
-  geom_smooth(aes(y = runtime, color = "runtime")) +
+  geom_smooth(aes(y = runtime, color = "runtime"), linetype = "dashed") +
   geom_point(aes(y = static)) +
   geom_point(aes(y = dynamic)) +
   geom_point(aes(y = guided)) +
