@@ -14,8 +14,37 @@ output:
 library(ggplot2)
 ```
 
-# Experimenting with Number of Threads 
-Fix everything but number of threads
+# Introduction
+Fish School Behavior (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies. 
+
+# Experimental Setup
+
+## Sequential Implementation
+
+To establish a baseline for comparison, a sequential C program was developed to simulate the behavior of a fish school using the FSB algorithm. 
+
+INSERT A GRAPH / EXECUTION TIME?
+
+## Parallel Implementation
+
+The parallel implementation was developed using OpenMP. We explored the following aspects of the parallelization process:
+
+1. Number of Threads
+
+2. Hyperparameters: Number of Fish & Iterations
+
+3. Thread Scheduling
+
+4. Cache Behavior
+
+
+# Experimental Results
+
+## Number of Threads
+In our first experiment we fixed the hyperparameters and scheduling strategy and ran the algorithm for a variety of thread numbers. The number of fish was fixed to xyz, the number of iterations was fixed to xyz, and the scheduling type fixed to static. This was because ..... No caching was employed as this was not the focus of this experiment  
+
+It was observed that the sequential implementation had a faster execution time, potentially due to not having any thread managment overhead. Some speedup occured in increasing the thread number from 2 to 4, but beyond 4 the speedup plateaued and decreased slightly, likely due to increased overhead from thread management.
+
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
@@ -30,6 +59,7 @@ ggplot(
         2929.350958,
         3000.694720)),
     aes(x = num_threads, y = time)) +
+    ggtitle("Execution Time vs Number of Threads") +
     labs(x = "Number of Threads", y = "Time (s)") +
     scale_x_continuous(
       breaks = seq(7),
@@ -38,12 +68,10 @@ ggplot(
     geom_smooth()
 ```
 
+## Hyperparameters: Number of Fish & Iterations
 
-# Experimenting with Number of Fish & Iterations 
+In our second experiment we fixed the number of threads and scheduling strategy and ran the algorithm for a variety of hyperparameter values. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiement. The scheduling type fixed to static and no caching was employed as this was not the focus of this experiment.  
 
-default, no scheduling 
-set at 4 threads 
-change iterations AND fish 
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 
@@ -54,7 +82,7 @@ ggplot(
     iter_40000 = c(234.463991,466.925614,700.021926,936.720754,1177.662832),
     iter_60000 = c(353.012268,701.901361,1050.975947,1418.876797,1777.164701),
     iter_80000 = c(471.402103,944.524666,1397.776130,1863.592248,2350.380621),
-    iter_100000 = c(586.554482, 1167.285182, 1697.776130,2363.592248, 2925.219894)),
+    iter_100000 = c(586.554482, 1167.285182, 1771.424057,2363.592248, 2925.219894)),
   aes(x = num_fish)) +
   geom_smooth(aes(y = iter_20000, color = "20000")) +
   geom_smooth(aes(y = iter_40000, color = "40000")) +
@@ -66,6 +94,7 @@ ggplot(
   geom_point(aes(y = iter_60000)) +
   geom_point(aes(y = iter_80000)) +
   geom_point(aes(y = iter_100000)) +
+  ggtitle("Execution Time vs Hyperparameters") +
   labs(x = "Number of Fish",
     y = "Time (s)",
     color = "Number of Iterations") +
@@ -77,8 +106,11 @@ ggplot(
     "100000" = "pink4"))
 ```
 
-# Kaiqi 
-Fix number of threads to be 4, change chunk size and scheduling types
+## Thread Scheduling
+
+In our third experiment we fixed the number of threads and hyperparameters and ran the algorithm the different scheduling strategies of static, dynamic, guided, and runtime. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiment. The hyperparameters were fixed to xyz and xyz because xyz.
+
+** was chunk size also changed?
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
@@ -97,6 +129,7 @@ ggplot(
   geom_point(aes(y = dynamic)) +
   geom_point(aes(y = guided)) +
   geom_point(aes(y = runtime)) +
+  ggtitle("Execution Time vs Scheduling Strategies") +
   labs(x = "Chunk Size",
     y = "Time (s)",
     color = "Scheduling Type") +
