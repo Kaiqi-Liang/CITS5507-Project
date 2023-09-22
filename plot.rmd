@@ -49,23 +49,27 @@ It was observed that the sequential implementation had a faster execution time, 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
     data.frame(
-      num_threads = seq(7),
-      time = c(
-        2780.588561,
+      num_threads = c(1, 2, 4, 6, 8, 16),
+      parallel = c(
         3220.587380,
         3471.353496,
         2925.219894,
         2944.861335,
         2929.350958,
-        3000.694720)),
-    aes(x = num_threads, y = time)) +
+        3000.694720),
+      sequential = 2780.588561),
+    aes(x = num_threads)) +
     ggtitle("Execution Time vs Number of Threads") +
-    labs(x = "Number of Threads", y = "Time (s)") +
-    scale_x_continuous(
-      breaks = seq(7),
-      labels = c("Sequential", 1, 2, 4, 6, 8, 16)) +
-    geom_point() +
-    geom_smooth()
+    labs(x = "Number of Threads",
+      y = "Time (s)",
+      linetype = "Parallel / Sequential") +
+    geom_smooth(aes(y = sequential, linetype = "sequential")) +
+    geom_smooth(aes(y = parallel, linetype = "parallel")) +
+    geom_point(aes(y = parallel)) +
+    scale_y_continuous(breaks = c(
+      setdiff(seq(2700, 3500, by = 100), 2800),
+      2780)) +
+    scale_x_continuous(breaks = 1:16)
 ```
 
 ## Hyperparameters: Number of Fish & Iterations
@@ -128,12 +132,12 @@ ggplot(
   geom_point(aes(y = static)) +
   geom_point(aes(y = dynamic)) +
   geom_point(aes(y = guided)) +
-  geom_point(aes(y = runtime)) +
   ggtitle("Execution Time vs Scheduling Strategies") +
   labs(x = "Chunk Size",
     y = "Time (s)",
     color = "Scheduling Type") +
   scale_x_continuous(labels = c(1, 10, 100, 10000)) +
+  scale_y_continuous(breaks = seq(2700, 4200, by = 300)) +
   scale_color_manual(values = c(
     "static" = "darkred",
     "dynamic" = "steelblue",
