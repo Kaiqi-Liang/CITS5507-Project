@@ -116,10 +116,10 @@ In our third experiment we fixed the number of threads and hyperparameters and r
 ggplot(
   data = data.frame(
     chunk_size = c(1, 2, 3, 4),
-    static = c(3000, 2784.864581, 3000, 2918.142244),
-    dynamic = c(3000, 3073.691588, 3000, 2982.671884),
-    guided = c(3000, 3000, 3000, 2946.995764),
-    runtime = 3000),
+    static = c(3265.162540, 2784.864581, 3035.950782, 2918.142244),
+    dynamic = c(4154.18010, 3073.691588, 2970.014433, 2982.671884),
+    guided = c(3051.865076, 2937.002249, 2941.794308, 2973.637886),
+    runtime = 4198.46404),
   aes(x = chunk_size)) +
   geom_smooth(aes(y = static, color = "static")) +
   geom_smooth(aes(y = dynamic, color = "dynamic")) +
