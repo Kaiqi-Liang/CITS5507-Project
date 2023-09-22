@@ -15,7 +15,7 @@ library(ggplot2)
 ```
 
 # Introduction
-Fish School Behavior (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies. 
+Fish School Behavior (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize a simple version of the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies. 
 
 # Experimental Setup
 
@@ -145,4 +145,19 @@ ggplot(
     "runtime" = "darkgreen"))
 ```
 
-Fix everything but different implementation of tasks vs partition and simple parallel for
+## OMP Directives 
+
+
+```{r}
+ggplot(
+  data=
+    data.frame(
+      OMP_Directive = c("OMP For", "OMP For (Sorted)", "OMP Task", "OMP Task ?"),
+      Time = c(10.5, 12.2, 8.7, 14.1)), aes(x = OMP_Directive, y = Time)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  labs(
+    title = "Execution Time for Different OMP Directives",
+    x = "OMP Directives",
+    y = "Time (s)"
+  ) 
+```
