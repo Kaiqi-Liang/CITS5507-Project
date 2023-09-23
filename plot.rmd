@@ -15,15 +15,50 @@ library(ggplot2)
 ```
 
 # Introduction
-Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize a simple version of the FSB algorithm and perform experiments, changing the hyperparameters and parallelisation strategies.
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelize a simple version of the FSB algorithm and perform a range of experiments to assess the impact of changing the hyperparameters and parallelisation strategies on execution time.
 
 # Experimental Setup
 
 ## Sequential Implementation
 
-To establish a baseline for comparison, a sequential C program was developed to simulate the behavior of a fish school using the FSB algorithm. 
+To establish a baseline for comparison, a sequential C program was developed to simulate the behavior of a fish school using the FSB algorithm. The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm
 
-INSERT A GRAPH / EXECUTION TIME?
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(
+  data = data.frame(
+    num_fish =  c(200000, 400000, 600000, 800000, 1000000),
+    iter_20000 = c(110.703507, 221.168173, 332.295848, 443.077424, 557.648611),
+    iter_40000 = c(222.853256, 448.680679, 677.698978, 886.666866, 1112.435153),
+    iter_60000 = c(334.170646,666.771699,1,1,1 ),
+    iter_80000 = c(1,1,1,1,1),
+    iter_100000 = c(1,1,1,1,1)),
+  aes(x = num_fish)) +
+  geom_smooth(aes(y = iter_20000, color = "20000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm", se = FALSE) +
+  geom_point(aes(y = iter_20000)) +
+  geom_point(aes(y = iter_40000)) +
+  geom_point(aes(y = iter_60000)) +
+  geom_point(aes(y = iter_80000)) +
+  geom_point(aes(y = iter_100000)) +
+  geom_smooth(aes(y = c(110.703507, 448.680679, 1050.975947, 1863.592248, 2925.219894)),
+    method = "lm",
+    formula = y ~ poly(x, 2),
+    linetype = "dotted",
+    se = FALSE) +
+  labs(title = "Execution Time vs Hyperparameters for Sequential Program",
+    x = "Number of Fish",
+    y = "Time (s)",
+    color = "Number of Iterations") +
+  scale_color_manual(values = c(
+    "20000" = "darkred",
+    "40000" = "steelblue",
+    "60000" = "magenta",
+    "80000" = "darkgreen",
+    "100000" = "pink4"))
+```
 
 ## Parallel Implementation
 
@@ -36,7 +71,6 @@ The parallel implementation was developed using OpenMP. We explored the followin
 3. Thread Scheduling
 
 4. Parallel Implementations using different OMP Directives
-
 
 # Experimental Results
 
@@ -124,7 +158,7 @@ ggplot(
     formula = y ~ poly(x, 2),
     linetype = "dotted",
     se = FALSE) +
-  labs(title = "Execution Time vs Hyperparameters",
+  labs(title = "Execution Time vs Hyperparameters for Parallel Program",
     x = "Number of Fish",
     y = "Time (s)",
     color = "Number of Iterations") +
