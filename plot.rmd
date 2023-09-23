@@ -50,10 +50,11 @@ From the results, provided below, it was observed that the sequential implementa
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
     data.frame(
-      num_threads = c(1, 2, 4, 5, 6, 8, 16),
+      num_threads = c(1, 2, 3, 4, 5, 6, 8, 16),
       parallel = c(
         3220.587380,
         3471.353496,
+        2984.539602,
         2925.219894,
         2944.861335,
         2977.993479,
@@ -72,6 +73,7 @@ ggplot(
       seq(2900, 3500, by = 100), 2780)) +
     scale_x_continuous(breaks = 1:16) +
     theme(panel.grid.minor = element_blank())
+
 ```
 
 ## Hyperparameters: Number of Fish & Iterations
