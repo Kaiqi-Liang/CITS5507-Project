@@ -6,6 +6,6 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --time=01:00:00
 
-g++ -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DSEQUENTIAL main.cpp -o sequential
+g++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DSEQUENTIAL main.cpp -o sequential
 
 srun ./sequential
