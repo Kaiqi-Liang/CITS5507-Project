@@ -84,7 +84,7 @@ From the results, provided below, it was observed that the sequential implementa
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
     data.frame(
-      num_threads = c(1, 2, 3, 4, 5, 6, 8, 16),
+      num_threads = c(1, 2, 3, 4, 5, 6, 8, 16, 32),
       parallel = c(
         3220.587380,
         3471.353496,
@@ -92,8 +92,9 @@ ggplot(
         2925.219894,
         2944.861335,
         2977.993479,
-        2929.350958,
-        3000.694720),
+        2976.687371,
+        3000.694720,
+        3028.914719),
       sequential = 2780.588561),
     aes(x = num_threads)) +
     labs(title = "Execution Time vs Number of Threads",
@@ -105,7 +106,10 @@ ggplot(
     geom_point(aes(y = parallel)) +
     scale_y_continuous(breaks = c(
       seq(2900, 3500, by = 100), 2780)) +
-    scale_x_continuous(breaks = 1:16) +
+    scale_x_continuous(breaks = c(
+      1:8,
+      seq(9, 15, by = 2),
+      seq(17, 32, by = 3))) +
     theme(panel.grid.minor = element_blank())
 
 ```
