@@ -29,8 +29,18 @@ ggplot(
     num_fish =  c(200000, 400000, 600000, 800000, 1000000),
     iter_20000 = c(110.703507, 221.168173, 332.295848, 443.077424, 557.648611),
     iter_40000 = c(222.853256, 448.680679, 677.698978, 886.666866, 1112.435153),
-    iter_60000 = c(334.170646, 666.771699, 1, 1, 1),
-    iter_80000 = c(1, 1, 1, 1, 1),
+    iter_60000 = c(
+      334.170646,
+      666.771699,
+      1004.9347861,
+      1455.1160081,
+      1820.057278),
+    iter_80000 = c(
+      442.774348,
+      887.792977,
+      1337.221277,
+      1789.476277,
+      2263.432539),
     iter_100000 = c(
       575.766097,
       1126.112223,
@@ -42,7 +52,8 @@ ggplot(
   geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
   geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
   geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm", se = FALSE) +
+  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm",
+    se = FALSE) +
   geom_point(aes(y = iter_20000)) +
   geom_point(aes(y = iter_40000)) +
   geom_point(aes(y = iter_60000)) +
@@ -51,9 +62,9 @@ ggplot(
   geom_smooth(aes(y = c(
     110.703507,
     448.680679,
-    1050.975947,
-    1863.592248,
-    2925.219894)),
+    1004.9347861,
+    1789.476277,
+    2829.059761)),
     method = "lm",
     formula = y ~ poly(x, 2),
     linetype = "dotted",
