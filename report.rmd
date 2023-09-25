@@ -13,7 +13,7 @@ library(knitr)
 
 # Introduction
 
-Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm and perform a range of experiments assessing the impact of changing the hyperparameters and parallelisation strategies on execution time.
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm and perform a range of experiments assessing the impact of changing the hyperparameters and parallelisation strategies on execution time. All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
 
 # Experiments
 
