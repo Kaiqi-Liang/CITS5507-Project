@@ -99,7 +99,7 @@ It is worth noting that while the cache behaviour of Setonix was researched, we 
 
 ### Number of Threads
 
-In our first experiment, we aimed to assess the impact of the number of threads on the parallelized FSB algorithm's performance while keeping hyperparameters and thread scheduling constant. Specifically, we maintained the number of fish at 1,000,000 and the number of iterations at 100,000 so that the results could be compared against the sequential implementation. Additionally, the default scheduling strategy of OpenMP (static) was employed.
+In our first experiment, we aimed to assess the impact of the number of threads on the parallelized FSB algorithm's performance while keeping hyperparameters and thread scheduling constant. Specifically, we maintained the number of fish at 1,000,000 and the number of iterations at 100,000 so that the results could be compared against the sequential implementation. Additionally, the default scheduling strategy of OpenMP (static) was employed with the default chunk size (unspecified).
 
 The graph below visualizes the relationship between the number of threads in the parallel program and the execution time (in seconds). For the purpose of comparison the sequential time is also indicated on the graph as a dashed line. Comparing the sequential and parallel implementations, no speedup was achieved. Rather, the sequential program had the fastest execution time of 2780 seconds (~46 minutes), likely due to the absence of thread management overhead. 
 
@@ -204,7 +204,7 @@ ggplot(
 
 ### Thread Scheduling
 
-In our third experiment, we investigated the impact of different thread scheduling strategies (static, dynamic, guided, and runtime) on the execution time of the parallelized FSB algorithm. Similar to previous experiments, the number of fish and iterations was fixed at 1,000,000 and 100,000 respectively. Additionally, the number of threads was fixed at 4 as this was proved to provide an optimal execution time. 
+In our third experiment, we investigated the impact of different thread scheduling strategies (static, dynamic, guided, and runtime) on the execution time of the parallelized FSB algorithm. Similar to previous experiments, the number of fish and iterations was fixed at 1,000,000 and 100,000 respectively. Additionally, the number of threads was fixed at 4 as this was proved to provide an optimal execution time.
 
 The graph below visualizes the relationship between the chunk size in the parallel program and the execution time (in seconds), across different scheduling strategies. While runtime scheduling does not employ a fixed chunk size, instead adjusting the value during runtime, it's recorded execution time is indicated on the graph as a dashed line for the purposes of comparison with the other scheduling types
 
@@ -213,6 +213,8 @@ The graph below visualizes the relationship between the chunk size in the parall
 
 As the time limit on Setonix is 1 hour, anything over 3600 seconds were run with fewer number of steps and scale the time back to the same as every other experiment, based on the previous experiments on Execution Time vs Hyperparameters we can conclude that execution time grows linerally with the nubmer of steps, so this estimate is accurate.
 * maybe explain a bit more how this was done - i don't really understand 
+
+Runtime scheduling is the slowest as there is a lot of overhead monitoring the performance during runtime while adjusting the chunk size. Dynamic scheduling with chunk size of 1 means each thread grabs 1 iteration off a queue each time which does not require much work so the overhead of too many thread switching makes is also slow. Static scheduling with a chunk size of 10 seems to be the optimal amount of work to allocate to each thread as it has the best performance. The rest scheduling methods and chunk sizes result in roughly the same performance.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
