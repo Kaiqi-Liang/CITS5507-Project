@@ -21,7 +21,7 @@ Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional 
 
 ## Sequential Implementation
 
-To establish a baseline for comparison, a sequential C program was developed to simulate the behavior of a fish school using the FSB algorithm. The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm
+To establish a baseline for comparison, a sequential C program was developed to simulate the behaviour of a fish school using the FSB algorithm. The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
@@ -139,7 +139,7 @@ ggplot(
 
 In the second experiment, we assessed the impact of varying two critical hyperparameters, the number of fish and the number of iterations, on the execution time of the parallel FSB algorithm. The number of threads fixed at 4 and a static scheduling strategy was employed. The number of threads was fixed to 4, as this was the optimal number achieved in the previous experiment Similar to the first experiment, caching was not employed.
 
-The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm. Increasing the number of fish, for a set number of iterations, results in a linear increase in execution time whereas increasing the number of iterations, for a set number of fish, results in a parabolic increase in execution time. This behavior is expected, as a larger population of fish and more iterations require more computation, resulting in longer execution times.
+The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for different numbers of iterations in the FSB algorithm. Increasing the number of fish, for a set number of iterations, results in a linear increase in execution time whereas increasing the number of iterations, for a set number of fish, results in a parabolic increase in execution time. This behaviour is expected, as a larger population of fish and more iterations require more computation, resulting in longer execution times.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
@@ -234,8 +234,9 @@ ggplot(
     "runtime" = "darkgreen"))
 ```
 
-## OMP Directives 
+## OMP Parallel Implementations
 
+In this experiment, we have 4 different implementations of our parallel programs. OMP For is simply using reduction of all 3 for loops (finding the maximum difference, for every fish eat and then swim, calculate the barycentre). OMP For Partition sorts the fish based on their coordinates in every step, so that OMP For can split the fish based on where they are in the pool acting like partitioning the whole pool into smaller regions and assign threads that way, but this turns out to be just extra work with no benefits. OMP Task Per Fish turns each fish's action in the second for loop into a task, this is a magnitude slower than the other implementations because the action is almost a constant number of operations, which is much faster than the overhead of thread switching. OMP Tasks splits the calculation for barycentre into 2, one is the denominator and the other is the numerator, these are independent but large amount of calculations so 2 threads will be assigned pick up these 2 tasks, it is slightly slower than the OMP For implementation as we are no longer splitting the work amongst the larger number of fish. Therefore in this situation OMP For is the best implementation as it makes the most sense to assign threads to handle a smaller number of fish and the position of the fish has no impact on the calculation.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
