@@ -13,12 +13,12 @@ void parallel_tasks(std::vector<Fish>& school) {
 		double denominator = 0;
 		#pragma omp parallel
 		{
-			#pragma omp for reduction(max: max_difference)
+			#pragma omp for reduction(max: max_difference) schedule(static)
 			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
 				max_difference = std::max(max_difference, school[j].difference());
 			}
 
-			#pragma omp for
+			#pragma omp for schedule(static)
 			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
 				school[j].action(i, max_difference);
 			}

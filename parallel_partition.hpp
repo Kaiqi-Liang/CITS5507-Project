@@ -14,12 +14,12 @@ void parallel_partition(std::vector<Fish>& school) {
 		double denominator = 0;
 		#pragma omp parallel
 		{
-			#pragma omp for reduction(max: max_difference)
+			#pragma omp for reduction(max: max_difference) schedule(static)
 			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
 				max_difference = std::max(max_difference, school[j].difference());
 			}
 
-			#pragma omp for
+			#pragma omp for schedule(static)
 			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
 				school[j].action(i, max_difference);
 			}
@@ -28,7 +28,7 @@ void parallel_partition(std::vector<Fish>& school) {
 		std::sort(school.begin(), school.end());
 		#pragma omp parallel
 		{
-			#pragma omp for reduction(+: numerator, denominator)
+			#pragma omp for reduction(+: numerator, denominator) schedule(static)
 			for (std::size_t j = 0; j < NUM_OF_FISH; j++) {
 				numerator += school[j].distance_ * school[j].weight_;
 				denominator += school[j].distance_;
