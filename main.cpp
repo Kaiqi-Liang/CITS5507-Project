@@ -23,7 +23,7 @@
 #endif
 
 int main() {
-	std::vector<Fish> school(NUM_OF_FISH);
+	std::vector<Fish> school(NUM_FISH);
 	double begin = omp_get_wtime();
 
 #ifdef SEQUENTIAL
