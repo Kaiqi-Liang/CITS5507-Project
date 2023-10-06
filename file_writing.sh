@@ -6,8 +6,6 @@
 #SBATCH --time=01:00:00
 #SBATCH --exclusive
 #SBATCH --mem-per-cpu=32G
-#module load openmpi/4.0.5
-
 export OMP_NUM_THREADS=4
 mpic++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DSEQUENTIAL -o file_writing file_writing.cpp
 perf stat -e cpu-clock srun ./file_writing 
