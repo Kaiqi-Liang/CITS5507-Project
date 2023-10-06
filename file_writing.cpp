@@ -5,9 +5,9 @@
 #include <mpi.h>
 
 #include "fish.hpp"
-// #include "parallel_for.hpp"
 
-constexpr size_t MASTER = 0;
+constexpr int MASTER = 0;
+constexpr size_t NUM_FIELDS = 4;
 
 void write_fish(std::vector<Fish> const &school, std::string const &filename) {
 	std::ofstream file(filename);
@@ -19,19 +19,19 @@ void write_fish(std::vector<Fish> const &school, std::string const &filename) {
 	file.close();
 }
 
-int main(int argc, char const *argv[]) {
+int main() {
 	std::vector<Fish> send_buf;
-	size_t process_id, num_processes;
-	MPI_Init(&argc, &argv);
+	int process_id, num_processes;
+	MPI_Init(0, 0);
 	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+	std::cout << num_processes << std::endl;
 	if (process_id == MASTER) {
 		send_buf = std::vector<Fish>(NUM_FISH);
-		write_fish("before");
+		write_fish(std::string{"before"});
 	}
 	int num_fish_per_process = NUM_FISH / num_processes;
 	std::vector<Fish> recv_buf(num_fish_per_process);
-	constexpr size_t NUM_FIELDS = 4;
 	MPI_Datatype MPI_FISH;
 	MPI_Datatype types[NUM_FIELDS];
 	std::fill_n(types, 4, MPI_DOUBLE);
@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]) {
 	    MPI_FISH,
 	    recv_buf.data(),
 	    num_fish_per_process,
-	    MPI_Datatype recv_datatype,
+	    MPI_FISH,
 	    MASTER,
 	    MPI_COMM_WORLD,
 	);
@@ -65,15 +65,14 @@ int main(int argc, char const *argv[]) {
 	    MPI_FISH,
 	    master_buf.data(),
 	    num_fish_per_process,
-	    MPI_Datatype recv_datatype,
+	    MPI_FISH,
 	    MASTER,
 	    MPI_COMM_WORLD,
 	);
 	assert(send_buf == master_buf);
 	if (process_id == MASTER) {
-		write_fish("after");
+		write_fish(std::string{"after"});
 	}
-	// parallel_for(school);
 	MPI_Finalize();
 	return 0;
 }

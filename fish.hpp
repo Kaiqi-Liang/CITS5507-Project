@@ -56,6 +56,8 @@ public:
 		return (x_ == fish.x_) ? y_ < fish.y_ : x_ < fish.x_;
 	}
 
+	bool operator==(Fish const &fish) const = default;
+
 	friend std::ostream &operator<<(std::ostream &os, Fish const &fish) {
 		return os << std::fixed << '(' << fish.x_ << ", " << fish.y_ << ") "
 		          << fish.weight_;
