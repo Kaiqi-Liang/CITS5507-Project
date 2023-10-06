@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <mpi.h>
+#include <string>
 
 #include "fish.hpp"
 
@@ -28,7 +30,7 @@ int main() {
 	std::cout << num_processes << std::endl;
 	if (process_id == MASTER) {
 		send_buf = std::vector<Fish>(NUM_FISH);
-		write_fish(std::string{"before"});
+		write_fish(send_buf, std::string{"before"});
 	}
 	int num_fish_per_process = NUM_FISH / num_processes;
 	std::vector<Fish> recv_buf(num_fish_per_process);
@@ -71,7 +73,7 @@ int main() {
 	);
 	assert(send_buf == master_buf);
 	if (process_id == MASTER) {
-		write_fish(std::string{"after"});
+		write_fish(master_buf, std::string{"after"});
 	}
 	MPI_Finalize();
 	return 0;

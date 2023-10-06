@@ -2,7 +2,6 @@
  * @author Kaiqi Liang (23344153)
  * @author Briana Davies-Morrell (22734723)
  */
-#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <omp.h>
