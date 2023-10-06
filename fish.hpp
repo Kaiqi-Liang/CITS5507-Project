@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <ostream>
 #include <random>
 
 /*
@@ -32,13 +33,15 @@ namespace {
 
 class Fish {
 public:
-	double distance_;
+	double x_;
+	double y_;
 	double weight_;
+	double distance_;
 
 	Fish()
-	: weight_{INITIAL_WEIGHT}
-	, x_{random_real_number(-100, 100)}
-	, y_{random_real_number(-100, 100)} {}
+	: x_{random_real_number(-100, 100)}
+	, y_{random_real_number(-100, 100)}
+	, weight_{INITIAL_WEIGHT} {}
 
 	void action(std::size_t step, double max_difference) {
 		eat(step, max_difference);
@@ -53,16 +56,18 @@ public:
 		return (x_ == fish.x_) ? y_ < fish.y_ : x_ < fish.x_;
 	}
 
-private:
-	double x_;
-	double y_;
+	friend std::ostream &operator<<(std::ostream &os, Fish const &fish) {
+		return os << std::fixed << '(' << fish.x_ << ", " << fish.y_ << ") "
+		          << fish.weight_;
+	}
 
+private:
 	void swim() {
 		if (weight_ == 2 * INITIAL_WEIGHT) return;
 		x_ += random_real_number(-0.1, 0.1);
 		y_ += random_real_number(-0.1, 0.1);
-		std::clamp(x_, -SQUARE, SQUARE);
-		std::clamp(y_, -SQUARE, SQUARE);
+		x_ = std::clamp(x_, -SQUARE, SQUARE);
+		y_ = std::clamp(y_, -SQUARE, SQUARE);
 	}
 
 	void eat(std::size_t step, double max_difference) {

@@ -29,7 +29,7 @@ void sequential(std::vector<Fish> &school) {
 			throw std::exception();
 		}
 #ifdef DEBUG
-		std::cout << barycentre << std::endl;
+		std::cout << std::fixed << barycentre << std::endl;
 #endif
 	}
 }
