@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
-#include <iostream>
 #include <iterator>
 #include <mpi.h>
 #include <string>
@@ -21,19 +20,7 @@ void write_fish(std::vector<Fish> const &school, std::string const &filename) {
 	file.close();
 }
 
-int main() {
-	std::vector<Fish> send_buf;
-	int process_id, num_processes;
-	MPI_Init(0, 0);
-	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
-	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
-	std::cout << num_processes << std::endl;
-	if (process_id == MASTER) {
-		send_buf = std::vector<Fish>(NUM_FISH);
-		write_fish(send_buf, std::string{"before"});
-	}
-	int num_fish_per_process = NUM_FISH / num_processes;
-	std::vector<Fish> recv_buf(num_fish_per_process);
+MPI_Datatype create_mpi_struct() {
 	MPI_Datatype MPI_FISH;
 	MPI_Datatype types[NUM_FIELDS];
 	std::fill_n(types, 4, MPI_DOUBLE);
@@ -47,6 +34,22 @@ int main() {
 	};
 	MPI_Type_create_struct(NUM_FIELDS, blocklengths, offsets, types, &MPI_FISH);
 	MPI_Type_commit(&MPI_FISH);
+	return MPI_FISH;
+}
+
+int main() {
+	std::vector<Fish> send_buf;
+	int process_id, num_processes;
+	MPI_Init(0, 0);
+	MPI_Datatype MPI_FISH = create_mpi_struct();
+	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
+	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+	if (process_id == MASTER) {
+		send_buf = std::vector<Fish>(NUM_FISH);
+		write_fish(send_buf, std::string{"before"});
+	}
+	int num_fish_per_process = NUM_FISH / num_processes;
+	std::vector<Fish> recv_buf(num_fish_per_process);
 	MPI_Scatter(
 	    send_buf.data(),
 	    num_fish_per_process,
@@ -55,7 +58,7 @@ int main() {
 	    num_fish_per_process,
 	    MPI_FISH,
 	    MASTER,
-	    MPI_COMM_WORLD,
+	    MPI_COMM_WORLD
 	);
 	std::vector<Fish> master_buf;
 	if (process_id == MASTER) {
@@ -69,7 +72,7 @@ int main() {
 	    num_fish_per_process,
 	    MPI_FISH,
 	    MASTER,
-	    MPI_COMM_WORLD,
+	    MPI_COMM_WORLD
 	);
 	assert(send_buf == master_buf);
 	if (process_id == MASTER) {
