@@ -17,7 +17,6 @@ void write_fish(std::vector<Fish> const &school, std::string const &filename) {
 	    school.cend(),
 	    std::ostream_iterator<Fish>(file)
 	);
-	file.close();
 }
 
 MPI_Datatype create_mpi_struct() {
