@@ -10,37 +10,37 @@
 #include "fish.hpp"
 
 #ifdef SEQUENTIAL
-#include "sequential.hpp"
+	#include "sequential.hpp"
 #elif PARALLEL_FOR
-#include "parallel_for.hpp"
+	#include "parallel_for.hpp"
 #elif PARALLEL_TASKS
-#include "parallel_tasks.hpp"
+	#include "parallel_tasks.hpp"
 #elif PARALLEL_TASK_PER_FISH
-#include "parallel_task_per_fish.hpp"
+	#include "parallel_task_per_fish.hpp"
 #elif PARALLEL_PARTITION
-#include "parallel_partition.hpp"
+	#include "parallel_partition.hpp"
 #endif
 
 int main() {
 	std::vector<Fish> school(NUM_FISH);
 	double begin = omp_get_wtime();
 
-#ifdef SEQUENTIAL
-	std::cout << "sequential\n";
-	sequential(school);
-#elif PARALLEL_FOR
-	parallel_for(school);
-	std::cout << "parallel_for\n";
-#elif PARALLEL_TASKS
-	std::cout << "parallel_tasks\n";
-	parallel_tasks(school);
-#elif PARALLEL_TASK_PER_FISH
-	std::cout << "parallel_task_per_fish\n";
-	parallel_task_per_fish(school);
-#elif PARALLEL_PARTITION
-	std::cout << "parallel_partition\n";
-	parallel_partition(school);
-#endif
+	#ifdef SEQUENTIAL
+		std::cout << "sequential\n";
+		sequential(school);
+	#elif PARALLEL_FOR
+		parallel_for(school);
+		std::cout << "parallel_for\n";
+	#elif PARALLEL_TASKS
+		std::cout << "parallel_tasks\n";
+		parallel_tasks(school);
+	#elif PARALLEL_TASK_PER_FISH
+		std::cout << "parallel_task_per_fish\n";
+		parallel_task_per_fish(school);
+	#elif PARALLEL_PARTITION
+		std::cout << "parallel_partition\n";
+		parallel_partition(school);
+	#endif
 
 	double end = omp_get_wtime();
 	double time_spent = end - begin;

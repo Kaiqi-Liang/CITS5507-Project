@@ -65,9 +65,9 @@ int main() {
 		double max_difference = 0;
 		double local_numerator = 0;
 		double local_denominator = 0;
-#pragma omp parallel
+		#pragma omp parallel
 		{
-#pragma omp for reduction(max : max_difference) schedule(static)
+			#pragma omp for reduction(max : max_difference) schedule(static)
 			for (int j = 0; j < num_fish_per_process; j++) {
 				max_difference =
 				    std::max(max_difference, recv_buf[j].difference());
@@ -92,15 +92,14 @@ int main() {
 		    MPI_COMM_WORLD
 		);
 
-#pragma omp parallel
+		#pragma omp parallel
 		{
-#pragma omp for schedule(static)
+			#pragma omp for schedule(static)
 			for (int j = 0; j < num_fish_per_process; j++) {
 				recv_buf[j].action(i, global_max_difference);
 			}
 
-#pragma omp for reduction(+ : local_numerator, local_denominator)              \
-    schedule(static)
+			#pragma omp for reduction(+ : local_numerator, local_denominator) schedule(static)
 			for (int j = 0; j < num_fish_per_process; j++) {
 				local_numerator += recv_buf[j].distance_ * recv_buf[j].weight_;
 				local_denominator += recv_buf[j].distance_;
@@ -132,9 +131,9 @@ int main() {
 			if (barycentre <= 0) {
 				throw std::exception();
 			}
-#ifdef DEBUG
-			std::cout << std::fixed << barycentre << std::endl;
-#endif
+			#ifdef DEBUG
+				std::cout << std::fixed << barycentre << std::endl;
+			#endif
 		}
 	}
 	MPI_Finalize();

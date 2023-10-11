@@ -28,8 +28,8 @@ void sequential(std::vector<Fish> &school) {
 		if (barycentre <= 0) {
 			throw std::exception();
 		}
-#ifdef DEBUG
-		std::cout << std::fixed << barycentre << std::endl;
-#endif
+		#ifdef DEBUG
+			std::cout << std::fixed << barycentre << std::endl;
+		#endif
 	}
 }
