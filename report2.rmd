@@ -1,5 +1,5 @@
 ---
-title: "CITS5507 Project 1: Parallel implementation of search based on Fish School Behaviour"
+title: "CITS5507 Project 2: Parallel implementation of search based on MPI and OpenMP"
 
 graphics: yes
 author: Kaiqi Liang (23344153), Briana Davies-Morrell (22734723)
@@ -13,11 +13,11 @@ library(knitr)
 
 # Introduction
 
-Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm and perform a range of experiments assessing the impact of changing the hyperparameters and parallelisation strategies on execution time. All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm using MPI and OpenMP and perform a range of experiments assessing the impact of changing the number of nodes and threads within each node on execution time. All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
 
 # Experiments
 
-The experiments are broken down into 2 parts, one is on the sequential implementation with different hyperparameters, the other is on the parallel implementation with not only different hyperparameters but also Setonix's performance behaviours with OpenMP. All the results have been measured several times and taken the average to get a better accuracy.
+The experiments are broken down into 2 parts, one is on the sequential implementation with different hyperparameters, the other is on the parallel implementation with different number of MPI nodes and OpenMP threads. All the results have been measured several times and taken the average to get a better accuracy.
 
 ## Sequential Implementation & Experiments
 
@@ -87,255 +87,34 @@ ggplot(
 
 ## Parallel Implementation & Experiments
 
-A parallel implementation of the FSB algorithm was developed using OpenMP. We explored the following aspects of the parallelization process on execution time. Please note that the first 4 experiments were performed with the standard OMP For directive and only in the last experiment were different directives used.
+A parallel implementation of the FSB algorithm was developed using OpenMP and MPI. We experimented with 2, 3, and 4 number of MPI nodes and 2, 4, 8, and 16 threads within each process. The results are given below
 
-1. Number of Threads
-
-2. Hyperparameters: Number of Fish & Iterations
-
-3. Thread Scheduling
-
-4. Cache Behaviour
-
-5. Parallelsation Strategies & OMP Directives
-
-### Number of Threads
-
-In our first experiment, we aimed to assess the impact of the number of threads on the parallelized FSB algorithm's performance while keeping hyperparameters and thread scheduling constant. Specifically, we maintained the number of fish at 1,000,000 and the number of iterations at 100,000 so that the results could be compared against the sequential implementation. Additionally, the default scheduling strategy of OpenMP (static) was employed with the default chunk size (unspecified).
-
-The graph below visualizes the relationship between the number of threads in the parallel program and the execution time (in seconds). For the purpose of comparison the sequential time is also indicated on the graph as a dashed line. Comparing the sequential and parallel implementations, no speedup was achieved. Rather, the sequential program had the fastest execution time of 2780 seconds (~46 minutes), likely due to the absence of thread management overhead.
-
-For the parallel implementation, a low number of threads (1-3) resulted in the slowest execution time which indicates that the overhead of thread management significantly outweighs the returns achieved from parallelizing the program. Some speedup was achieved in increasing the number of threads from 3 to 4, with a local minimum of 2925 seconds (~48 minutes) achieved at 4 threads, thus indicating an optimal balance between thread overheads and returns from parallelization. However, beyond 4 threads the execution time increased before remaining relatively stable at 3000 seconds (~50 minutes). The diminishing returns in terms of parallelization efficiency can be attributed to increased overhead from thread management.
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-ggplot(
-    data.frame(
-      num_threads = c(1, 2, 3, 4, 5, 6, 8, 16, 32),
-      parallel = c(
-        3220.587380,
-        3471.353496,
-        2984.539602,
-        2925.219894,
-        2944.861335,
-        2977.993479,
-        2976.687371,
-        3000.694720,
-        3028.914719),
-      sequential = 2780.588561),
-    aes(x = num_threads)) +
-    labs(title = "Execution Time vs Number of Threads",
-      x = "Number of Threads",
-      y = "Time (s)",
-      linetype = "Parallel / Sequential") +
-    geom_smooth(aes(y = sequential, linetype = "sequential")) +
-    geom_line(aes(y = parallel, linetype = "parallel")) +
-    geom_point(aes(y = parallel)) +
-    scale_y_continuous(breaks = c(
-      seq(2900, 3500, by = 100), 2780)) +
-    scale_x_continuous(breaks = c(
-      1:8,
-      seq(9, 15, by = 2),
-      seq(17, 32, by = 3))) +
-    theme(panel.grid.minor = element_blank())
-```
-
-### Hyperparameters: Number of Fish & Iterations
-
-In the second experiment, we assessed the impact of varying two critical hyperparameters, the number of fish and the number of iterations, on the execution time of the parallel FSB algorithm. The number of threads was fixed at 4 as this was proved to provide an optimal execution time, as demonstrated in the previous experiment. Similar to the first experiment, static scheduling was employed.
-
-Similar to the graph provided for the sequential implementation, the graph below visualizes the relationship between the number of fish and the execution time (in seconds) for a different number of iterations in the FSB algorithm. The results are akin to those found for the sequential code - increasing one hyperparameter results in a linear increase in execution time and increasing both hyperparameters results in a parabolic increase in execution time. Overall, all execution times are slower when compared to the sequential version.
+### Execution Time vs Number of MPI Nodes & OpenMP Threads
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
-    num_fish =  c(200000, 400000, 600000, 800000, 1000000),
-    iter_20000 = c(117.350819, 237.082449, 397.935612, 482.203047, 653.402037),
-    iter_40000 = c(234.463991, 466.925614, 700.021926, 936.720754, 1177.662832),
-    iter_60000 = c(
-      353.012268,
-      701.901361,
-      1050.975947,
-      1418.876797,
-      1777.164701),
-    iter_80000 = c(
-      471.402103,
-      944.524666,
-      1397.776130,
-      1863.592248,
-      2350.380621),
-    iter_100000 = c(
-      586.554482,
-      1167.285182,
-      1771.424057,
-      2363.592248,
-      2925.219894)),
-  aes(x = num_fish)) +
-  geom_smooth(aes(y = iter_20000, color = "20000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm",
-    se = FALSE) +
-  geom_point(aes(y = iter_20000)) +
-  geom_point(aes(y = iter_40000)) +
-  geom_point(aes(y = iter_60000)) +
-  geom_point(aes(y = iter_80000)) +
-  geom_point(aes(y = iter_100000)) +
-  geom_smooth(aes(y = c(
-    117.350819,
-    466.925614,
-    1050.975947,
-    1863.592248,
-    2925.219894)),
-    method = "lm",
-    formula = y ~ poly(x, 2),
-    linetype = "dotted",
-    se = FALSE) +
-  labs(title = "Execution Time vs Hyperparameters for Parallel Program",
-    x = "Number of Fish",
+    num_nodes =  c(1, 2, 3, 4),
+    threads_2 = c(1,1,1,1),
+    threads_4 = c(1,1,1,1),
+    threads_8 = c(1,1,1,1),
+    threads_16 = c(1,1,1,1)),
+  aes(x = num_nodes)) +
+  geom_smooth(aes(y = threads_2, color = "2"), se = FALSE) +
+  geom_smooth(aes(y = threads_4, color = "4"), se = FALSE) +
+  geom_smooth(aes(y = threads_8, color = "8"),  se = FALSE) +
+  geom_smooth(aes(y = threads_16, color = "16"), se = FALSE) +
+  geom_point(aes(y = threads_2)) +
+  geom_point(aes(y = threads_4)) +
+  geom_point(aes(y = threads_8)) +
+  geom_point(aes(y = threads_16)) +
+  labs(title = "Execution Time vs Number of MPI Nodes & OpenMP Threads",
+    x = "Number of MPI Nodes",
     y = "Time (s)",
-    color = "Number of Iterations") +
+    color = "Number of Threads") +
   scale_color_manual(values = c(
-    "20000" = "darkred",
-    "40000" = "steelblue",
-    "60000" = "magenta",
-    "80000" = "darkgreen",
-    "100000" = "pink4"))
-```
-
-### Thread Scheduling
-
-In our third experiment, we investigated the impact of different thread scheduling strategies (static, dynamic, guided, and runtime) on the execution time of the parallelized FSB algorithm. Similar to previous experiments, the number of fish and iterations was fixed at 1,000,000 and 100,000 respectively. Additionally, the number of threads was fixed at 4 as this was proved to provide an optimal execution time.
-
-The graph below visualizes the relationship between the chunk size in the parallel program and the execution time (in seconds), across different scheduling strategies. While runtime scheduling does not employ a fixed chunk size, instead adjusting the value during runtime, it's recorded execution time is indicated on the graph as a dashed line for the purposes of comparison with the other scheduling types.
-
-Two experiments, runtime and dynamic scheduling with chunk size of 1, could not be run to completion on Setonix due to the time limit of 1 hour. However, as our previous experiments with the hyperparameters showed the execution time to grow linearly with the number of iterations, we were able to run these two experiments for a smaller number of iterations (10,000) and then scale the time back to what it would be for 100,000 iterations.
-
-As evident below, runtime was the slowest scheduling type with a execution time of 4198 seconds (~70 minutes) . This could be due to a range of reasons, such as additional overhead from adjusting the chunk size during runtime, inappropriate chunk sizes, increased synchronization needs etc. The performance of dynamic scheduling improved with chunk size, with it's worst execution time of 4154 seconds (~69 minutes) occurring at chunk size 1 and best execution time of 2982 seconds(~50 minutes) occurring at chunk size 1,000. This is to be expected as this method of scheduling involves dividing the work and assigns each chunk to a thread as soon as it becomes available. Thus, smaller chunk sizes mean more frequent scheduling, which can introduce overhead.
-
-Guided scheduling exhibited relatively consistent execution times (around 3000 seconds or 50 minutes) across different chunk sizes, with only a slight increase in performance seen between chunk size 1 and 10/100, and a slight decrease in performance between 10/100 and 1000. As guided scheduling aims to balance loads while also minimising scheduling overhead by gradually reducing chunk sizes, the lack of fluctuation (unlike what we see in static scheduling) does make sense.
-
-Overall, static scheduling shows a decrease in execution times for increasing chunk sizes with the worst execution time of 3265 seconds (~54 minutes) occurring at a chunk size of 1. This behaviour is expected as static scheduling allocates a fixed amount of work to each thread at the beginning, and with larger chunk sizes, the overhead of task allocation decreases, resulting in improved performance. The local minimum of 2784 seconds (~46 minutes) at a chunk size of 10, followed by a slight increase in execution time for larger chunk sizes is likely due to load imbalances caused by fewer chunks to distribute among threads. For the 4 threads used in this experiment the chunk size of 10 in static scheduling is optimal.
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-ggplot(
-  data = data.frame(
-    chunk_size = c(1, 2, 3, 4),
-    static = c(3265.162540, 2784.864581, 3035.950782, 2918.142244),
-    dynamic = c(4154.18010, 3073.691588, 2970.014433, 2982.671884),
-    guided = c(3051.865076, 2937.002249, 2941.794308, 2973.637886),
-    runtime = 4198.46404),
-  aes(x = chunk_size)) +
-  geom_smooth(aes(y = static, color = "static")) +
-  geom_smooth(aes(y = dynamic, color = "dynamic")) +
-  geom_smooth(aes(y = guided, color = "guided")) +
-  geom_smooth(aes(y = runtime, color = "runtime"), linetype = "dashed") +
-  geom_point(aes(y = static)) +
-  geom_point(aes(y = dynamic)) +
-  geom_point(aes(y = guided)) +
-  labs(title = "Execution Time vs Scheduling Strategies",
-    x = "Chunk Size",
-    y = "Time (s)",
-    color = "Scheduling Type") +
-  scale_x_continuous(labels = c(1, 10, 100, 10000)) +
-  scale_y_continuous(breaks = seq(2700, 4200, by = 300)) +
-  scale_color_manual(values = c(
-    "static" = "darkred",
-    "dynamic" = "steelblue",
-    "guided" = "magenta",
-    "runtime" = "darkgreen"))
-```
-
-### Cache Behaviour
-
-In our fourth experiment, we explored the Setonix cache behaviour using different chunk size for the static scheduling with 4 threads. This experiment is run via the script `parallel_for_cache.sh` where the command `perf stat -e cache-references,cache-mises` is used to output the cache references and cache misses. This time the number of fish and iterations was fixed at 1,000,000 and 10,000 respectively to avoid any timeouts.
-
-The cache miss rate is calculated by `number of cache miss / number of cache reference` which is `y-axis / x-axis`. This can be represented as the gradient. The closer to the `y = x` diagonal line the higher the cache miss is as any point on that line means 100% cache miss.
-
-Since the cache size of Setonix is not publicly provided, it is very difficult to do experiments on its cache behaviour, we can only guess. From the graph below we can see chunk size of 100000 has the lowest less cache misses, meaning that every thread gets dealt 100000 blocks of iteration to work on each time which requires the CPU the access 100000 fish objects before it gets dealt again. A single `fish` object contains 4 `double`s, adding up to 32 bytes, let's assume 100000 is the optimal chunk size in terms of caching then 3200000 bytes (3.2 MB) is the estimated cache size of Setonix if every time a thread starts executing all the data it needs will be fetched once and then sits in the cache until the thread finishes all its iterations. The rest of the chunk sizes have no particular order in cache misses and during the experiments the results vary a lot between different runs, therefore this is only a hypothesis not a conclusion.
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-df <- data.frame(
-  chunk_size = c(
-    100000,
-    10000,
-    1000,
-    100,
-    10,
-    1),
-  cache_references = c(
-    1671540,
-    1611032,
-    1619233,
-    1706372,
-    1633097,
-    1609516),
-  cache_misses = c(
-    270988,
-    275896,
-    292923,
-    292073,
-    282283,
-    270946),
-  percentage = c(
-    16.212,
-    17.125,
-    18.090,
-    17.117,
-    17.285,
-    16.834))
-axis_limits <- c(0, max(c(df$cache_references, df$cache_misses)))
-ggplot(df) +
-  geom_point(aes(
-    x = cache_references,
-    y = cache_misses,
-    colour = as.factor(chunk_size))) +
-  geom_segment(aes(
-    x = 0,
-    y = 0,
-    xend = cache_references,
-    yend = cache_misses),
-    linetype = "dashed") +
-  xlim(axis_limits) +
-  ylim(axis_limits) +
-  coord_fixed() +
-  labs(title = "Cache Behaviour on different chunk sizes",
-    x = "Number of Cache Reference",
-    y = "Number of Cache Miss",
-    color = "Chunk Size")
-kable(df)
-```
-
-### Parallelsation Strategies & OMP Directives
-
-In our final experiment, we explored a range of different parallelization strategies and OMP directives. Similar to previous experiments, the number of fish was fixed at 1,000,000, the number of threads were fixed at 4, and static scheduling was employed. The number of iterations was reduced to 1,000 as not all of the experiments could complete a larger number of iterations within the 1 hour Setonix time limit. 
-
-We experimented with four different strategies, two using OMP For and two using OMP Task. The OMP For strategies involved reduction for two out of the three for loops: identifying the maximum difference, and calculating the barycenter. The middle for loop is simulating each fish's eating and swimming behaviour which does not require reduction hence can be turned into OMP Task later on. In one of the OMP For experiments, labelled OMP For Partition, we introduced a step were the fish were sorted based on their coordinates in each iteration, allowing OMP For to split the fish into distinct regions within the pool. Essentially, this partitioned the entire pool into smaller segments and assigned threads based on location. However, as illustrated in the graph below, this approach ended up being slower than the standard OMP For without sorting. As sorting is just extra computation work and assigning threads based on the fish location has zero performance gains.
-
-OMP Tasks involved splitting the calculation for barycentre into 2; the first being the calculation of the denominator and the second being the calculation of the numerator. Two threads will be assigned to pick up these two tasks. As evident in the graph below, this implementation is slightly slower than the OMP For implementation as we are no longer splitting the work amongst the large number of fish. Another OMP Task strategy, labelled OMP Task Per Fish, turned each fish's action in the second for loop into a task. However, this proved to be a magnitude slower than the other implementations because the behaviour of each fish consists of a constant number of operations, which is can be completed in a much shorter time than the overhead of doing thread switching.
-
-These 4 strategies are implemented in 4 different files, `parallel_for.hpp`, `parallel_partition.hpp`, `parallel_tasks.hpp` and `parallel_task_per_fish.hpp`. Overall, the standard OMP For proved to be the fastest implementation. This was to be expected given the position of the fish has no impact on the calculation, and it makes the most sense to assign threads to handle a smaller number of fish.
-
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-ggplot(
-  data = data.frame(
-    omp_directive = c(
-      "OMP For",
-      "OMP For Partition",
-      "OMP Task",
-      "OMP Task Per Fish"),
-    time = c(
-      295.652146,
-      885.287894,
-      305.464913,
-      4877.38059),
-    colour_group = c(rep("OMP For", 2), rep("OMP Task", 2))),
-  aes(x = omp_directive, y = time, fill = colour_group)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Execution Time for Different OMP Directives & Strategies",
-       x = "Directives & Strategies",
-       y = "Time (s)",
-       fill = "OMP Directives"
-  ) +
-  scale_fill_manual(values = c("darkred", "steelblue"))
+    "2" = "darkred",
+    "4" = "steelblue",
+    "8" = "magenta",
+    "16" = "darkgreen"))
 ```
