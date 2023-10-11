@@ -12,8 +12,8 @@ Default Hyper-parameters
 ----------------------------------------
 */
 
-constexpr std::size_t NUM_STEPS = 100000;
-constexpr std::size_t NUM_FISH = 1000000;
+constexpr std::size_t NUM_STEPS = 1000;
+constexpr std::size_t NUM_FISH = 120000000;
 constexpr double SQUARE = 100;
 constexpr double INITIAL_WEIGHT = 1000000;
 constexpr double INITIAL_FOOD = 1;
