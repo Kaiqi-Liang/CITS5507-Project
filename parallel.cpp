@@ -66,7 +66,7 @@ int main() {
 		#pragma omp parallel
 		{
 			#pragma omp for reduction(max : max_difference) schedule(static)
-			for (std::size_t j = 0; j < num_fish_per_process; j++) {
+			for (int j = 0; j < num_fish_per_process; j++) {
 				max_difference =
 				    std::max(max_difference, recv_buf[j].difference());
 			}
@@ -93,12 +93,12 @@ int main() {
 		#pragma omp parallel
 		{
 			#pragma omp for schedule(static)
-			for (std::size_t j = 0; j < num_fish_per_process; j++) {
+			for (int j = 0; j < num_fish_per_process; j++) {
 				recv_buf[j].action(i, global_max_difference);
 			}
 
 			#pragma omp for reduction(+ : local_numerator, local_denominator) schedule(static)
-			for (std::size_t j = 0; j < num_fish_per_process; j++) {
+			for (int j = 0; j < num_fish_per_process; j++) {
 				local_numerator += recv_buf[j].distance_ * recv_buf[j].weight_;
 				local_denominator += recv_buf[j].distance_;
 			}
@@ -107,7 +107,7 @@ int main() {
 		double global_numerator;
 		double global_denominator;
 		MPI_Reduce(
-		    &numerator,
+		    &local_numerator,
 		    &global_numerator,
 		    1,
 		    MPI_DOUBLE,
@@ -116,7 +116,7 @@ int main() {
 		    MPI_COMM_WORLD
 		);
 		MPI_Reduce(
-		    &denominator,
+		    &local_denominator,
 		    &global_denominator,
 		    1,
 		    MPI_DOUBLE,
@@ -130,7 +130,7 @@ int main() {
 				throw std::exception();
 			}
 #ifdef DEBUG
-			std::cout << barycentre << std::endl;
+			std::cout << std::fixed << barycentre << std::endl;
 #endif
 		}
 	}
