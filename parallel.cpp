@@ -37,6 +37,7 @@ MPI_Datatype create_mpi_struct() {
 }
 
 int main() {
+	std::cout << "parallel mpi + openmp\n";
 	std::vector<Fish> send_buf;
 	int process_id, num_processes;
 	MPI_Init(0, 0);

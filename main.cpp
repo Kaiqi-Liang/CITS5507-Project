@@ -26,20 +26,20 @@ int main() {
 	double begin = omp_get_wtime();
 
 #ifdef SEQUENTIAL
-	sequential(school);
 	std::cout << "sequential\n";
+	sequential(school);
 #elif PARALLEL_FOR
 	parallel_for(school);
 	std::cout << "parallel_for\n";
 #elif PARALLEL_TASKS
-	parallel_tasks(school);
 	std::cout << "parallel_tasks\n";
+	parallel_tasks(school);
 #elif PARALLEL_TASK_PER_FISH
-	parallel_task_per_fish(school);
 	std::cout << "parallel_task_per_fish\n";
+	parallel_task_per_fish(school);
 #elif PARALLEL_PARTITION
-	parallel_partition(school);
 	std::cout << "parallel_partition\n";
+	parallel_partition(school);
 #endif
 
 	double end = omp_get_wtime();
