@@ -29,8 +29,8 @@ int main() {
 		std::cout << "sequential\n";
 		sequential(school);
 	#elif PARALLEL_FOR
-		parallel_for(school);
 		std::cout << "parallel_for\n";
+		parallel_for(school);
 	#elif PARALLEL_TASKS
 		std::cout << "parallel_tasks\n";
 		parallel_tasks(school);

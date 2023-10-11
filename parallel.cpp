@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <mpi.h>
+#include <omp.h>
 #include <string>
 
 #include "fish.hpp"
@@ -37,7 +38,7 @@ int main() {
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	if (process_id == MASTER) {
 		std::cout << "mpi + openmp with " << num_processes << " processes and "
-		    << omp_get_num_threads() << "threads\n";
+		    << omp_get_num_threads() << " threads\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
 	}
 	const int num_fish_per_process = NUM_FISH / num_processes;

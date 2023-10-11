@@ -7,5 +7,5 @@
 #SBATCH --exclusive
 #SBATCH --mem-per-cpu=32G
 export OMP_NUM_THREADS=4
-mpic++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast -DSEQUENTIAL -o parallel parallel.cpp
+mpic++ -fopenmp -std=c++20 -pedantic -Wall -Wextra -Wconversion -Wshadow -Ofast parallel.cpp -o parallel
 perf stat -e cpu-clock srun ./parallel
