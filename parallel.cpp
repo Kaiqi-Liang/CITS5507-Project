@@ -11,15 +11,6 @@
 constexpr int MASTER = 0;
 constexpr size_t NUM_FIELDS = 4;
 
-void write_fish(std::vector<Fish> const &school, std::string const &filename) {
-	std::ofstream file(filename);
-	std::copy(
-	    school.cbegin(),
-	    school.cend(),
-	    std::ostream_iterator<Fish>(file)
-	);
-}
-
 MPI_Datatype create_mpi_struct() {
 	MPI_Datatype MPI_FISH;
 	MPI_Datatype types[NUM_FIELDS];
@@ -38,7 +29,6 @@ MPI_Datatype create_mpi_struct() {
 }
 
 int main() {
-	std::cout << "parallel mpi + openmp\n";
 	std::vector<Fish> send_buf;
 	int process_id, num_processes;
 	MPI_Init(0, 0);
@@ -46,8 +36,9 @@ int main() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	if (process_id == MASTER) {
+		std::cout << "mpi + openmp with " << num_processes << " processes and "
+		    << omp_get_num_threads() << "threads\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
-		write_fish(send_buf, std::string{"before"});
 	}
 	const int num_fish_per_process = NUM_FISH / num_processes;
 	std::vector<Fish> recv_buf(num_fish_per_process);
