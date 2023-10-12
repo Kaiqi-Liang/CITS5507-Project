@@ -13,7 +13,37 @@ library(knitr)
 
 # Introduction
 
-Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm using MPI and OpenMP and perform a range of experiments assessing the impact of changing the number of nodes and threads within each node on execution time. All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
+All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
+
+## File Writing
+
+The code for experimenting the communication using MPI by generating the fish data and outputting it to two files is in [`file_writing.cpp`](https://github.com/Kaiqi-Liang/CITS5507-Project/blob/main/file_writing.cpp). Submit job by running the following command.
+
+```bash
+sbatch file_writing.sh
+```
+
+After the job has completed there should be 2 files `before` and `after` which can be checked by running the following command.
+
+```bash
+diff before after
+```
+
+This should produce no output.
+
+## Simulation
+
+The code for programming multicore clusters to run the fish school simulation is in [`parallel.cpp`](https://github.com/Kaiqi-Liang/CITS5507-Project/blob/main/parallel.cpp). To use only MPI implementation run the following command.
+
+```bash
+sbatch mpi.sh
+```
+
+To use both MPI and OpenMP implementation run the following command.
+
+```bash
+sbatch parallel.sh
+```
 
 # Experiments
 

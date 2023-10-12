@@ -4,7 +4,9 @@
 #include <iostream>
 #include <iterator>
 #include <mpi.h>
-#include <omp.h>
+#ifdef OPENMP
+	#include <omp.h>
+#endif
 #include <string>
 
 #include "fish.hpp"
@@ -37,8 +39,7 @@ int main() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	if (process_id == MASTER) {
-		std::cout << "mpi + openmp with " << num_processes << " processes and "
-		    << omp_get_num_threads() << " threads\n";
+		std::cout << "mpi + openmp with " << num_processes << " processes\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
 	}
 	const int num_fish_per_process = NUM_FISH / num_processes;
@@ -57,13 +58,12 @@ int main() {
 		double max_difference = 0;
 		double local_numerator = 0;
 		double local_denominator = 0;
-		#pragma omp parallel
-		{
-			#pragma omp for reduction(max : max_difference) schedule(static)
-			for (int j = 0; j < num_fish_per_process; j++) {
-				max_difference =
-				    std::max(max_difference, recv_buf[j].difference());
-			}
+		#ifdef OPENMP
+			#pragma omp parallel for reduction(max : max_difference) schedule(static)
+		#endif
+		for (int j = 0; j < num_fish_per_process; j++) {
+			max_difference =
+			    std::max(max_difference, recv_buf[j].difference());
 		}
 
 		double global_max_difference;
@@ -84,18 +84,19 @@ int main() {
 		    MPI_COMM_WORLD
 		);
 
-		#pragma omp parallel
-		{
-			#pragma omp for schedule(static)
-			for (int j = 0; j < num_fish_per_process; j++) {
-				recv_buf[j].action(i, global_max_difference);
-			}
+		#ifdef OPENMP
+			#pragma omp parallel for schedule(static)
+		#endif
+		for (int j = 0; j < num_fish_per_process; j++) {
+			recv_buf[j].action(i, global_max_difference);
+		}
 
-			#pragma omp for reduction(+ : local_numerator, local_denominator) schedule(static)
-			for (int j = 0; j < num_fish_per_process; j++) {
-				local_numerator += recv_buf[j].distance_ * recv_buf[j].weight_;
-				local_denominator += recv_buf[j].distance_;
-			}
+		#ifdef OPENMP
+			#pragma omp parallel for reduction(+ : local_numerator, local_denominator) schedule(static)
+		#endif
+		for (int j = 0; j < num_fish_per_process; j++) {
+			local_numerator += recv_buf[j].distance_ * recv_buf[j].weight_;
+			local_denominator += recv_buf[j].distance_;
 		}
 
 		double global_numerator;
