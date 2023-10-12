@@ -39,7 +39,12 @@ int main() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	if (process_id == MASTER) {
-		std::cout << "mpi + openmp with " << num_processes << " processes\n";
+		#ifdef OPENMP
+			std::cout << "mpi with ";
+		#else
+			std::cout << "mpi + openmp with ";
+		#endif
+		std::cout << num_processes << " processes\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
 	}
 	const int num_fish_per_process = NUM_FISH / num_processes;
