@@ -13,9 +13,17 @@ library(knitr)
 
 # Introduction
 
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm using both MPI (Message Passing Interface) and OpenMP (Open Multi-Processing) frameworks. The goal was to build upon our previous OpenMP implementation from Project 1 and integrate MPI for distributed computing across multiple nodes. 
+
+The project consists of two main deliverables; the actual MPI implementation and experiments with different configurations, including varying the number of MPI nodes and the number of threads under each MPI node.
+
+# MPI Implementation  
+
 All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
 
 ## File Writing
+
+In this section, we established effective communication using MPI by performing an experiment in fish data distribution. The master process generates the fish data and distributes it evenly among the worker nodes. Each node, including the master, sends back its portion of the data to the master. This process is logged in two files before & after for validation.
 
 The code for experimenting the communication using MPI by generating the fish data and outputting it to two files is in [`file_writing.cpp`](https://github.com/Kaiqi-Liang/CITS5507-Project/blob/main/file_writing.cpp). Submit job by running the following command.
 
@@ -29,9 +37,11 @@ After the job has completed there should be 2 files `before` and `after` which c
 diff before after
 ```
 
-This should produce no output.
+This will produce no output. The file comparison ensures that the transmitted data remains consistent across processes. In the case that the file_writing file is submitted with very large hyperparameters (such as 60 million fish), the two files will not be identical as only some of the data will be written to the files. This is because very large hyperparameters require storage in Setonix that we do not have access to.  
 
 ## Simulation
+
+In this section, we integrated our OpenMP implementation from Project 1 with our new MPI implementation to simulate fish school behavior. MPI serves as the overarching framework, while OpenMP operates beneath it, managing the parallelism at the thread level. 
 
 The code for programming multicore clusters to run the fish school simulation is in [`parallel.cpp`](https://github.com/Kaiqi-Liang/CITS5507-Project/blob/main/parallel.cpp). To use only MPI implementation run the following command.
 
@@ -47,104 +57,81 @@ sbatch parallel.sh
 
 # Experiments
 
-The experiments are broken down into 2 parts, one is on the sequential implementation with different hyperparameters, the other is on the parallel implementation with different number of MPI nodes and OpenMP threads. All the results have been measured several times and taken the average to get a better accuracy.
+We experimented by varying the number of MPI nodes and adjust the number of threads under each MPI node. All the results have been measured several times and taken the average to get a better accuracy. 
 
-## Sequential Implementation & Experiments
+In Project 1 the relationship between the hyperparamaters (fish & number of iterations) and execution time was established. No interaction was found between the number of threads and the hyperparameters (that is, the execution time increased linearly with either the fish or iterations, or quadratically with both, regardless of the number of threads in use). As such, hyperparameters were not experimented with this time around. Instead a constant value of 60,000,000 fish and 1000 iterations were used throughout all experiments. 
 
-To establish a baseline for comparison, a sequential C++ program was developed to simulate the behaviour of a fish school using the FSB algorithm.
+Moreover, Project 1 revealed the sequential implemented to have a faster execution time than any of the OpenMP implementations. As such, the sequential time is used as a baseline for comparison throughout all experiments performed here. For the set hyperparameters, the sequential time was 1755 seconds (~29 minutes).
 
-The graph below visualizes the relationship between the number of fish and the execution time (in seconds) for a different number of iterations in the FSB algorithm. Increasing the number of fish, for a set number of iterations, or increasing the number of iterations, for a set number of fish, results in a linear increase in execution time. Increasing both the number of fish and iterations results in a parabolic increase in execution time. This behaviour is to be expected as the FSB algorithm consists of two nested loops over the number of iterations and fish and thus has a time complexity of O(FI) where F is the number of fish and I is the number of iterations. Overall, a larger population of fish and more iterations require more computation, resulting in longer execution times.
+### MPI Only
 
-Our most computationally expensive experiment ran for 2780 seconds (~46 minutes) at 1,000,000 fish and 100,000 iterations. This value was used as a baseline for comparison for all parallel experiments.
+In our first experiment, we aimed to assess the impact of utilizing the MPI framework on the FSB algorithm's performance. This involved timing the MPI only implementation, wherein no OpenMP threads were involved. 
+
+The graph below shows the measured execution time for 1, 2, 3, and 4 nodes, as well as the baseline time of the sequential implementation. As expected, the execution time decreases exponentially as the number of MPI nodes increases. In particular, one node has the worst execution of 1822 seconds (~30 minutes) which is slower than the sequential implementation. This makes sense, as the overheads from inter-process communication and synchronization outweigh the benefits of parallelism when there's only one node involved.
+
+As we move to 2 nodes, the execution time drops significantly to 914 seconds (~15 minutes). With 3 nodes, the execution time further decreases to 613 seconds (~10 minutes), and with 4 nodes, it drops to 461 seconds (~8 minutes). These reductions in execution time demonstrate the effectiveness of parallel processing, with the workload being distributed and processed concurrently across multiple nodes.
+
+It's important to note that while the execution time decreases with additional nodes, there is a diminishing return in performance improvement. This aligns with Amdahl's Law, which states that the speedup of a parallel program is limited by its sequential portion. In our case, as we increase the number of nodes, the sequential portion becomes a smaller fraction of the total execution time, leading to diminishing returns in speedup.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
-  data = data.frame(
-    num_fish =  c(200000, 400000, 600000, 800000, 1000000),
-    iter_20000 = c(110.703507, 221.168173, 332.295848, 443.077424, 557.648611),
-    iter_40000 = c(222.853256, 448.680679, 677.698978, 886.666866, 1112.435153),
-    iter_60000 = c(
-      334.170646,
-      666.771699,
-      1004.9347861,
-      1455.1160081,
-      1820.057278),
-    iter_80000 = c(
-      442.774348,
-      887.792977,
-      1337.221277,
-      1789.476277,
-      2263.432539),
-    iter_100000 = c(
-      575.766097,
-      1126.112223,
-      1697.037298,
-      2230.462189,
-      2780.588561)),
-  aes(x = num_fish)) +
-  geom_smooth(aes(y = iter_20000, color = "20000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_40000, color = "40000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_60000, color = "60000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_80000, color = "80000"), method = "lm", se = FALSE) +
-  geom_smooth(aes(y = iter_100000, color = "100000"), method = "lm",
-    se = FALSE) +
-  geom_point(aes(y = iter_20000)) +
-  geom_point(aes(y = iter_40000)) +
-  geom_point(aes(y = iter_60000)) +
-  geom_point(aes(y = iter_80000)) +
-  geom_point(aes(y = iter_100000)) +
-  geom_smooth(aes(y = c(
-    110.703507,
-    448.680679,
-    1004.9347861,
-    1789.476277,
-    2780.588561)),
-    method = "lm",
-    formula = y ~ poly(x, 2),
-    linetype = "dotted",
-    se = FALSE) +
-  labs(title = "Execution Time vs Hyperparameters for Sequential Program",
-    x = "Number of Fish",
-    y = "Time (s)",
-    color = "Number of Iterations") +
-  scale_color_manual(values = c(
-    "20000" = "darkred",
-    "40000" = "steelblue",
-    "60000" = "magenta",
-    "80000" = "darkgreen",
-    "100000" = "pink4"))
+    data.frame(
+      num_nodes = c(1, 2, 3, 4),
+      mpi = c(
+        1822.379590476,
+        914.486197804,
+        612.819364970,
+        460.707667057),
+      sequential = 1754.656590),
+    aes(x = num_nodes)) +
+    labs(title = "Execution Time vs Number of MPI Nodes",
+      x = "Number of Nodes",
+      y = "Time (s)",
+      linetype = "Parallel / Sequential") +
+    geom_point(aes(y = mpi)) +
+    geom_smooth(aes(y = sequential, linetype = "sequential")) +
+    geom_smooth(aes(y = mpi, linetype = "mpi only"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+    theme(panel.grid.minor = element_blank())
 ```
 
-## Parallel Implementation & Experiments
+### MPI & OpenMP 
 
-A parallel implementation of the FSB algorithm was developed using OpenMP and MPI. We experimented with 2, 3, and 4 number of MPI nodes and 2, 4, 8, and 16 threads within each process. The results are given below
+In our second experiment, we investigated the impact of varying the number of OpenMP threads under the MPI implementation on the execution time of the parallelized FSB algorithm. 
 
-### Execution Time vs Number of MPI Nodes & OpenMP Threads
+The graph below visualizes the relationship between the number of MPI nodes (1, 2, 3, 4) and the execution time (in seconds) for varying numbers of OpenMP threads (0, 2, 4, 8, 16). The case of 0 threads, reflected by the blue line refers to the MPI only implementation we discussed previously. All other number of threads are shown by the green line as the execution times remain relatively stable across various configurations of OpenMP threads under each MPI node. This trend suggests that the number of OpenMP threads does not significantly impact the execution time.
+
+Additionally, it is evident below that introducing OpenMP threads under each MPI node improves execution times when compared to the MPI-only execution. This is due to the increased intra-node parallelism brought by OpenMP. The impact of OpenMP threads is most pronounced when there are fewer MPI nodes, as demonstrated by the steeper decrease in execution times. This signifies that within a single node, threading enables effective concurrent processing. However, the curve predominantly follows an exponential decrease as the number of MPI nodes increases, indicating that the MPI framework remains the primary driver of performance gains in this parallelized implementation.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
     num_nodes =  c(1, 2, 3, 4),
-    threads_2 = c(1,1,1,1),
-    threads_4 = c(1,1,1,1),
-    threads_8 = c(1,1,1,1),
-    threads_16 = c(1,1,1,1)),
+    mpi = c(1822.379590476,914.486197804,612.819364970,460.707667057),
+    threads_2 = c(1770.137878338,888.847948670,595.635013834,449.641916923),
+    threads_4 = c(1769.391758150,888.820532438,594.955746320,448.248664594),
+    threads_8 = c(1771.727156207,891.127868899,595.044071098,449.024061848),
+    threads_16 = c(1770.336729298,889.954078117,596.349251760,449.729564190)),
   aes(x = num_nodes)) +
-  geom_smooth(aes(y = threads_2, color = "2"), se = FALSE) +
-  geom_smooth(aes(y = threads_4, color = "4"), se = FALSE) +
-  geom_smooth(aes(y = threads_8, color = "8"),  se = FALSE) +
-  geom_smooth(aes(y = threads_16, color = "16"), se = FALSE) +
-  geom_point(aes(y = threads_2)) +
-  geom_point(aes(y = threads_4)) +
-  geom_point(aes(y = threads_8)) +
-  geom_point(aes(y = threads_16)) +
+  geom_smooth(aes(y = mpi, color = "0 - MPI Only"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_2, color = "2"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_4, color = "4"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_8, color = "8"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_16, color = "16"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_point(aes(y = mpi, color = "0 - MPI Only")) +
+  geom_point(aes(y = threads_2, color = "2")) +
+  geom_point(aes(y = threads_4, color = "4")) +
+  geom_point(aes(y = threads_8, color = "8")) +
+  geom_point(aes(y = threads_16, color = "16"))+
+
+  
   labs(title = "Execution Time vs Number of MPI Nodes & OpenMP Threads",
     x = "Number of MPI Nodes",
     y = "Time (s)",
     color = "Number of Threads") +
   scale_color_manual(values = c(
+    "0 - MPI Only" = "steelblue",
     "2" = "darkred",
-    "4" = "steelblue",
+    "4" = "pink",
     "8" = "magenta",
     "16" = "darkgreen"))
 ```
