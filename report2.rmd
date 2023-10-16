@@ -13,7 +13,7 @@ library(knitr)
 
 # Introduction
 
-Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm using both MPI (Message Passing Interface) and OpenMP (Open Multi-Processing) frameworks. The goal was to build upon our previous OpenMP implementation from Project 1 and integrate MPI for distributed computing across multiple nodes. 
+Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional optimization problems. The objective of this project was to parallelise a much simpler version of the FSB algorithm using both MPI (Message Passing Interface) and OpenMP (Open Multi-Processing) frameworks. The goal was to build upon our previous OpenMP implementation from Project 1 and integrate MPI for distributed computing across multiple nodes.
 
 The project consists of two main deliverables; the actual MPI implementation and experiments with different configurations, including varying the number of MPI nodes and the number of threads under each MPI node.
 
@@ -41,7 +41,7 @@ This will produce no output. The file comparison ensures that the transmitted da
 
 ## Simulation
 
-In this section, we integrated our OpenMP implementation from Project 1 with our new MPI implementation to simulate fish school behavior. MPI serves as the overarching framework, while OpenMP operates beneath it, managing the parallelism at the thread level. 
+In this section, we integrated our OpenMP implementation from Project 1 with our new MPI implementation to simulate fish school behaviour. MPI serves as the overarching framework, while OpenMP operates beneath it, managing the parallelism at the thread level.
 
 The code for programming multicore clusters to run the fish school simulation is in [`parallel.cpp`](https://github.com/Kaiqi-Liang/CITS5507-Project/blob/main/parallel.cpp). To use only MPI implementation run the following command.
 
@@ -90,7 +90,8 @@ ggplot(
       linetype = "Parallel / Sequential") +
     geom_point(aes(y = mpi)) +
     geom_smooth(aes(y = sequential, linetype = "sequential")) +
-    geom_smooth(aes(y = mpi, linetype = "mpi only"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+    geom_smooth(aes(y = mpi, linetype = "mpi only"),
+      method = "lm", formula = y ~ exp(-x), se = FALSE) +
     theme(panel.grid.minor = element_blank())
 ```
 
@@ -106,24 +107,28 @@ Additionally, it is evident below that introducing OpenMP threads under each MPI
 ggplot(
   data = data.frame(
     num_nodes =  c(1, 2, 3, 4),
-    mpi = c(1822.379590476,914.486197804,612.819364970,460.707667057),
-    threads_2 = c(1770.137878338,888.847948670,595.635013834,449.641916923),
-    threads_4 = c(1769.391758150,888.820532438,594.955746320,448.248664594),
-    threads_8 = c(1771.727156207,891.127868899,595.044071098,449.024061848),
-    threads_16 = c(1770.336729298,889.954078117,596.349251760,449.729564190)),
+    mpi = c(1822.379590476, 914.486197804, 612.819364970, 460.707667057),
+    threads_2 = c(1770.137878338, 888.847948670, 595.635013834, 449.641916923),
+    threads_4 = c(1769.391758150, 888.820532438, 594.955746320, 448.248664594),
+    threads_8 = c(1771.727156207, 891.127868899, 595.044071098, 449.024061848),
+    threads_16 = c(1770.336729298, 889.954078117, 596.349251760, 449.729564190)
+  ),
   aes(x = num_nodes)) +
-  geom_smooth(aes(y = mpi, color = "0 - MPI Only"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_smooth(aes(y = threads_2, color = "2"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_smooth(aes(y = threads_4, color = "4"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_smooth(aes(y = threads_8, color = "8"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_smooth(aes(y = threads_16, color = "16"), method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = mpi, color = "0 - MPI Only"),
+    method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_2, color = "2"),
+    method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_4, color = "4"),
+    method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_8, color = "8"),
+    method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_smooth(aes(y = threads_16, color = "16"),
+    method = "lm", formula = y ~ exp(-x), se = FALSE) +
   geom_point(aes(y = mpi, color = "0 - MPI Only")) +
   geom_point(aes(y = threads_2, color = "2")) +
   geom_point(aes(y = threads_4, color = "4")) +
   geom_point(aes(y = threads_8, color = "8")) +
-  geom_point(aes(y = threads_16, color = "16"))+
-
-  
+  geom_point(aes(y = threads_16, color = "16")) +
   labs(title = "Execution Time vs Number of MPI Nodes & OpenMP Threads",
     x = "Number of MPI Nodes",
     y = "Time (s)",
