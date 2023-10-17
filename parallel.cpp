@@ -17,15 +17,20 @@ constexpr size_t NUM_FIELDS = 4;
 int main() {
 	std::vector<Fish> send_buf;
 	int process_id, num_processes;
-	MPI_Init(0, 0);
+	#ifdef OPENMP
+		int provided;
+		MPI_Init_thread(0, 0, MPI_THREAD_FUNNELED, &provided);
+	#else
+		MPI_Init(0, 0);
+	#endif
 	const MPI_Datatype MPI_FISH = create_mpi_struct();
 	MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	if (process_id == MASTER) {
 		#ifdef OPENMP
-			std::cout << "mpi with ";
-		#else
 			std::cout << "mpi + openmp with ";
+		#else
+			std::cout << "mpi with ";
 		#endif
 		std::cout << num_processes << " tasks\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
