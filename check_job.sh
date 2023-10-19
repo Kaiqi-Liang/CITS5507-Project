@@ -1,4 +1,4 @@
-jobs=5
+jobs=5 # The number of jobs allowed to submit is less than 5
 while true
 do
 	curr=`squeue | grep kliang1 | wc -l`

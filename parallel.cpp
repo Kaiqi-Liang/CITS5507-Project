@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -10,26 +9,10 @@
 #include <string>
 
 #include "fish.hpp"
+#include "parallel.hpp"
 
 constexpr int MASTER = 0;
 constexpr size_t NUM_FIELDS = 4;
-
-MPI_Datatype create_mpi_struct() {
-	MPI_Datatype MPI_FISH;
-	MPI_Datatype types[NUM_FIELDS];
-	std::fill_n(types, 4, MPI_DOUBLE);
-	int blocklengths[NUM_FIELDS];
-	std::fill_n(blocklengths, 4, 1);
-	const MPI_Aint offsets[NUM_FIELDS] = {
-	    offsetof(Fish, distance_),
-	    offsetof(Fish, weight_),
-	    offsetof(Fish, x_),
-	    offsetof(Fish, y_),
-	};
-	MPI_Type_create_struct(NUM_FIELDS, blocklengths, offsets, types, &MPI_FISH);
-	MPI_Type_commit(&MPI_FISH);
-	return MPI_FISH;
-}
 
 int main() {
 	std::vector<Fish> send_buf;
@@ -44,7 +27,7 @@ int main() {
 		#else
 			std::cout << "mpi + openmp with ";
 		#endif
-		std::cout << num_processes << " processes\n";
+		std::cout << num_processes << " tasks\n";
 		send_buf = std::vector<Fish>(NUM_FISH);
 	}
 	const int num_fish_per_process = NUM_FISH / num_processes;
