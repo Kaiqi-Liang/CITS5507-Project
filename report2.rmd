@@ -97,19 +97,19 @@ ggplot(
     linetype = "dashed") +
   geom_smooth(aes(y = mpi, color = "1 (MPI Only)"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = mpi, color = "1 (MPI Only)")) +
+  geom_point(aes(y = mpi, color = "1 (MPI Only)"), shape = 21) +
   geom_smooth(aes(y = threads_2, color = "2"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = threads_2, color = "2")) +
+  geom_point(aes(y = threads_2, color = "2"), shape = 22) +
   geom_smooth(aes(y = threads_4, color = "4"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = threads_4, color = "4")) +
+  geom_point(aes(y = threads_4, color = "4"), shape = 23) +
   geom_smooth(aes(y = threads_8, color = "8"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = threads_8, color = "8")) +
+  geom_point(aes(y = threads_8, color = "8"), shape = 24) +
   geom_smooth(aes(y = threads_16, color = "16"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = threads_16, color = "16")) +
+  geom_point(aes(y = threads_16, color = "16"), shape = 25) +
   theme(panel.grid.minor = element_blank()) +
   scale_color_manual(values = c(
     "1 (Sequential)" = "purple",
@@ -124,36 +124,61 @@ ggplot(
 
 In our second experiment, we investigated the impact of varying the number of tasks per nodes for 4 tasks under the MPI and combined with OpenMP implementation on the execution time of the parallelised FSB algorithm.
 
-We fixed the number of tasks to 4 and experimented with 1, 2, 4 and 5 number of tasks per nodes which resulted in being allocated 4, 2 and 1 Setonix compute node. If we specified 3 number of tasks per node it will print the following because 4 is not divisible by 3.
+We fixed the number of tasks to 4 and experimented with 1, 2, 3, 4 and 5 number of tasks per nodes which resulted in being allocated 4, 2 and 1 Setonix compute node. If we specified 3 number of tasks per node it will print the following because 4 is not divisible by 3.
 
 ```
 Warning: can't honor --ntasks-per-node set to 3 which doesn't match the requested tasks 4
 with the number of requested nodes 2. Ignoring --ntasks-per-node.
 ```
 
-Our hypothesis is any number above 4 will also have the same result because we only have 4 tasks, 4 or above number of tasks per node will always allocate 1 node for us. The graph below confirmed our hypothesis, the last 2 data points for each line stay flat. It also shows that assigning 1 task per node gives the best performance because we get 4 compute nodes rather than sharing the CPUs within a node between task. However when putting all tasks into 1 node completely avoided the communication between nodes via network connections, thus giving us only slightly better speedup than having 2 nodes with 2 tasks each allocated to each, but still not as good as the pure performance gain from using completely separate nodes for each task. This trend is true across both MPI only implementation and combined with OpenMP for all number of threads, and to echo the conclusion from first experiment most OpenMP experiments turned out to be slightly faster than without using OpenMP but roughly the same time regardless of the number of threads used.
+Our hypothesis is any number from 3 will all have the same result because we only have 4 tasks, 3 tasks per node is ignored and any number greater than or equal to 4 will get allocated 1 node to run all 4 tasks. The graph below confirmed our hypothesis, the last 3 data points (3, 4 and 5 number of tasks per node) for each line stay flat. It also shows that assigning 1 task per node gives the best performance because we get 4 compute nodes rather than sharing the CPUs within a node between task. However when putting all tasks into 1 node completely avoided the communication between nodes via network connections, thus giving us only slightly better speedup than having 2 nodes with 2 tasks each allocated to each, but still not as good as the pure performance gain from using completely separate nodes for each task. This trend is true across both MPI only implementation and combined with OpenMP for all number of threads, and to echo the conclusion from first experiment most OpenMP experiments turned out to be slightly faster than without using OpenMP but roughly the same time regardless of the number of threads used.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
   data = data.frame(
-    num_tasks = c(1, 2, 4, 5),
-    mpi = c(460.864967726, 465.061370608, 464.380644771, 464.408472428),
-    thread_2 = c(452.171921260, 463.303976195, 458.472190107, 458.456342535),
-    thread_4 = c(457.904325192, 465.062157786, 463.488311895, 463.548838141),
-    thread_8 = c(451.987779002, 462.307877353, 459.908851021, 459.808448797),
-    thread_16 = c(452.892428487, 460.530417067, 459.940209202, 459.792117470)
+    num_tasks = seq(1, 5),
+    mpi = c(
+      460.864967726,
+      470.456927876,
+      464.579775953,
+      464.380644771,
+      464.408472428),
+    thread_2 = c(
+      452.171921260,
+      463.303976195,
+      459.320273628,
+      458.472190107,
+      458.456342535),
+    thread_4 = c(
+      457.904325192,
+      465.062157786,
+      463.172169014,
+      463.488311895,
+      463.548838141),
+    thread_8 = c(
+      451.987779002,
+      462.307877353,
+      460.291607817,
+      459.908851021,
+      459.808448797),
+    thread_16 = c(
+      452.892428487,
+      464.530417067,
+      460.791890543,
+      459.940209202,
+      459.792117470)
   ),
   aes(x = num_tasks)) +
   geom_line(aes(y = mpi, color = "1 (MPI Only)")) +
-  geom_point(aes(y = mpi)) +
+  geom_point(aes(y = mpi), shape = 21) +
   geom_line(aes(y = thread_2, color = "2")) +
-  geom_point(aes(y = thread_2)) +
+  geom_point(aes(y = thread_2), shape = 22) +
   geom_line(aes(y = thread_4, color = "4")) +
-  geom_point(aes(y = thread_4)) +
+  geom_point(aes(y = thread_4), shape = 23) +
   geom_line(aes(y = thread_8, color = "8")) +
-  geom_point(aes(y = thread_8)) +
+  geom_point(aes(y = thread_8), shape = 24) +
   geom_line(aes(y = thread_16, color = "16")) +
-  geom_point(aes(y = thread_16)) +
+  geom_point(aes(y = thread_16), shape = 25) +
   labs(title = "Execution Time vs Number of Tasks Per Node for 4 Nodes",
     x = "Number of Tasks Per Node",
     y = "Time (s)",
