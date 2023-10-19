@@ -17,7 +17,7 @@ Fish School Behaviour (FSB) is a heuristic algorithm used for multi-dimensional 
 
 The project consists of two main deliverables; the actual MPI implementation and experiments with different configurations, including varying the number of MPI nodes and the number of threads under each MPI node.
 
-# MPI Implementation  
+# Implementation
 
 All of the code can be found on [**GitHub**](https://github.com/Kaiqi-Liang/CITS5507-Project).
 
@@ -63,50 +63,25 @@ In Project 1 the relationship between the hyperparamaters (fish & number of iter
 
 Moreover, Project 1 revealed the sequential implemented to have a faster execution time than any of the OpenMP implementations. As such, the sequential time is used as a baseline for comparison throughout all experiments performed here. For the set hyperparameters, the sequential time was 1755 seconds (~29 minutes).
 
-### MPI Only
+## MPI & OpenMP
 
-In our first experiment, we aimed to assess the impact of utilizing the MPI framework on the FSB algorithm's performance. This involved timing the MPI only implementation, wherein no OpenMP threads were involved. 
+In our first experiment, we aimed to assess the impact of utilizing the MPI framework and varying the number of OpenMP threads under the MPI implementation on the execution time of the parallelised FSB algorithm. This involved timing the sequential implementation, the MPI only implementation wherein no OpenMP threads were involved as well as the OpenMP implementation under MPI with different number of threads.
 
-The graph below shows the measured execution time for 1, 2, 3, and 4 nodes, as well as the baseline time of the sequential implementation. As expected, the execution time decreases exponentially as the number of MPI nodes increases. In particular, one node has the worst execution of 1822 seconds (~30 minutes) which is slower than the sequential implementation. This makes sense, as the overheads from inter-process communication and synchronization outweigh the benefits of parallelism when there's only one node involved.
+The graph below shows the measured execution time using different number of MPI Nodes (1, 2, 3, 4), the baseline time of the sequential implementation and using different number of OpenMP threads including one implementation that did not use OpenMP (blue). As expected, the execution time decreases exponentially as the number of MPI nodes increases. In particular, one node has the worst execution of 1822 seconds (~30 minutes) which is slower than the sequential implementation. This makes sense, as the overheads from inter-process communication and synchronization outweigh the benefits of parallelism when there's only one node involved.
 
 As we move to 2 nodes, the execution time drops significantly to 914 seconds (~15 minutes). With 3 nodes, the execution time further decreases to 613 seconds (~10 minutes), and with 4 nodes, it drops to 461 seconds (~8 minutes). These reductions in execution time demonstrate the effectiveness of parallel processing, with the workload being distributed and processed concurrently across multiple nodes.
 
 It's important to note that while the execution time decreases with additional nodes, there is a diminishing return in performance improvement. This aligns with Amdahl's Law, which states that the speedup of a parallel program is limited by its sequential portion. In our case, as we increase the number of nodes, the sequential portion becomes a smaller fraction of the total execution time, leading to diminishing returns in speedup.
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
-ggplot(
-    data.frame(
-      num_nodes = c(1, 2, 3, 4),
-      mpi = c(
-        1822.379590476,
-        914.486197804,
-        612.819364970,
-        460.707667057),
-      sequential = 1754.656590),
-    aes(x = num_nodes)) +
-    labs(title = "Execution Time vs Number of MPI Nodes",
-      x = "Number of Nodes",
-      y = "Time (s)",
-      linetype = "Parallel / Sequential") +
-    geom_point(aes(y = mpi)) +
-    geom_smooth(aes(y = sequential, linetype = "sequential")) +
-    geom_smooth(aes(y = mpi, linetype = "mpi only"),
-      method = "lm", formula = y ~ exp(-x), se = FALSE) +
-    theme(panel.grid.minor = element_blank())
-```
+Looking at lines that are meant to plot the run time using different number of OpenMP threads we can only see the pink line as the execution times remain relatively stable across various configurations of OpenMP threads under each MPI node. This trend suggests that the number of OpenMP threads does not impact the execution time.
 
-### MPI & OpenMP 
-
-In our second experiment, we investigated the impact of varying the number of OpenMP threads under the MPI implementation on the execution time of the parallelized FSB algorithm. 
-
-The graph below visualizes the relationship between the number of MPI nodes (1, 2, 3, 4) and the execution time (in seconds) for varying numbers of OpenMP threads (0, 2, 4, 8, 16). The case of 0 threads, reflected by the blue line refers to the MPI only implementation we discussed previously. All other number of threads are shown by the green line as the execution times remain relatively stable across various configurations of OpenMP threads under each MPI node. This trend suggests that the number of OpenMP threads does not significantly impact the execution time.
-
-Additionally, it is evident below that introducing OpenMP threads under each MPI node improves execution times when compared to the MPI-only execution. This is due to the increased intra-node parallelism brought by OpenMP. The impact of OpenMP threads is most pronounced when there are fewer MPI nodes, as demonstrated by the steeper decrease in execution times. This signifies that within a single node, threading enables effective concurrent processing. However, the curve predominantly follows an exponential decrease as the number of MPI nodes increases, indicating that the MPI framework remains the primary driver of performance gains in this parallelized implementation.
+However, compare to the MPI implementation that did not use OpenMP it is evident below that introducing OpenMP threads under each MPI node still improved the execution times by just above 10 seconds. This is due to the increased intra-node parallelism brought by OpenMP. The impact of OpenMP threads is most pronounced when there are fewer MPI nodes, as demonstrated by the steeper decrease in execution times. This signifies that within a single node, threading enables effective concurrent processing. However, the curve predominantly follows an exponential decrease as the number of MPI nodes increases, indicating that the MPI framework remains the primary driver of performance gains in this parallelised implementation.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 ggplot(
-  data = data.frame(
-    num_nodes =  c(1, 2, 3, 4),
+  data.frame(
+    num_nodes = seq(1, 4),
+    sequential = 1754.656590,
     mpi = c(1822.379590476, 914.486197804, 612.819364970, 460.707667057),
     threads_2 = c(1770.137878338, 888.847948670, 595.635013834, 449.641916923),
     threads_4 = c(1769.391758150, 888.820532438, 594.955746320, 448.248664594),
@@ -114,29 +89,79 @@ ggplot(
     threads_16 = c(1770.336729298, 889.954078117, 596.349251760, 449.729564190)
   ),
   aes(x = num_nodes)) +
-  geom_smooth(aes(y = mpi, color = "0 - MPI Only"),
+  labs(title = "Execution Time vs Number of MPI Nodes",
+    x = "Number of Nodes",
+    y = "Time (s)",
+    color = "Number of Threads") +
+  geom_line(aes(y = sequential, color = "1 (Sequential)"),
+    linetype = "dashed") +
+  geom_smooth(aes(y = mpi, color = "1 (MPI Only)"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_point(aes(y = mpi, color = "1 (MPI Only)")) +
   geom_smooth(aes(y = threads_2, color = "2"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_point(aes(y = threads_2, color = "2")) +
   geom_smooth(aes(y = threads_4, color = "4"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_point(aes(y = threads_4, color = "4")) +
   geom_smooth(aes(y = threads_8, color = "8"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
+  geom_point(aes(y = threads_8, color = "8")) +
   geom_smooth(aes(y = threads_16, color = "16"),
     method = "lm", formula = y ~ exp(-x), se = FALSE) +
-  geom_point(aes(y = mpi, color = "0 - MPI Only")) +
-  geom_point(aes(y = threads_2, color = "2")) +
-  geom_point(aes(y = threads_4, color = "4")) +
-  geom_point(aes(y = threads_8, color = "8")) +
   geom_point(aes(y = threads_16, color = "16")) +
-  labs(title = "Execution Time vs Number of MPI Nodes & OpenMP Threads",
-    x = "Number of MPI Nodes",
+  theme(panel.grid.minor = element_blank()) +
+  scale_color_manual(values = c(
+    "1 (Sequential)" = "purple",
+    "1 (MPI Only)" = "steelblue",
+    "2" = "darkgreen",
+    "4" = "darkred",
+    "8" = "magenta",
+    "16" = "pink"))
+```
+
+### Number of Tasks Per Node
+
+In our second experiment, we investigated the impact of varying the number of tasks per nodes for 4 tasks under the MPI and combined with OpenMP implementation on the execution time of the parallelised FSB algorithm.
+
+We fixed the number of tasks to 4 and experimented with 1, 2, 4 and 5 number of tasks per nodes which resulted in being allocated 4, 2 and 1 Setonix compute node. If we specified 3 number of tasks per node it will print the following because 4 is not divisible by 3.
+
+```
+Warning: can't honor --ntasks-per-node set to 3 which doesn't match the requested tasks 4
+with the number of requested nodes 2. Ignoring --ntasks-per-node.
+```
+
+Our hypothesis is any number above 4 will also have the same result because we only have 4 tasks, 4 or above number of tasks per node will always allocate 1 node for us. The graph below confirmed our hypothesis, the last 2 data points for each line stay flat. It also shows that assigning 1 task per node gives the best performance because we get 4 compute nodes rather than sharing the CPUs within a node between task. However when putting all tasks into 1 node completely avoided the communication between nodes via network connections, thus giving us only slightly better speedup than having 2 nodes with 2 tasks each allocated to each, but still not as good as the pure performance gain from using completely separate nodes for each task. This trend is true across both MPI only implementation and combined with OpenMP for all number of threads, and to echo the conclusion from first experiment most OpenMP experiments turned out to be slightly faster than without using OpenMP but roughly the same time regardless of the number of threads used.
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(
+  data = data.frame(
+    num_tasks = c(1, 2, 4, 5),
+    mpi = c(460.864967726, 465.061370608, 464.380644771, 464.408472428),
+    thread_2 = c(452.171921260, 463.303976195, 458.472190107, 458.456342535),
+    thread_4 = c(457.904325192, 465.062157786, 463.488311895, 463.548838141),
+    thread_8 = c(451.987779002, 462.307877353, 459.908851021, 459.808448797),
+    thread_16 = c(452.892428487, 460.530417067, 459.940209202, 459.792117470)
+  ),
+  aes(x = num_tasks)) +
+  geom_line(aes(y = mpi, color = "1 (MPI Only)")) +
+  geom_point(aes(y = mpi)) +
+  geom_line(aes(y = thread_2, color = "2")) +
+  geom_point(aes(y = thread_2)) +
+  geom_line(aes(y = thread_4, color = "4")) +
+  geom_point(aes(y = thread_4)) +
+  geom_line(aes(y = thread_8, color = "8")) +
+  geom_point(aes(y = thread_8)) +
+  geom_line(aes(y = thread_16, color = "16")) +
+  geom_point(aes(y = thread_16)) +
+  labs(title = "Execution Time vs Number of Tasks Per Node for 4 Nodes",
+    x = "Number of Tasks Per Node",
     y = "Time (s)",
     color = "Number of Threads") +
   scale_color_manual(values = c(
-    "0 - MPI Only" = "steelblue",
-    "2" = "darkred",
-    "4" = "pink",
+    "1 (MPI Only)" = "steelblue",
+    "2" = "darkgreen",
+    "4" = "darkred",
     "8" = "magenta",
-    "16" = "darkgreen"))
+    "16" = "pink"))
 ```
