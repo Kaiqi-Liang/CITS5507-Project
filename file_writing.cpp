@@ -8,9 +8,6 @@
 #include "fish.hpp"
 #include "parallel.hpp"
 
-constexpr int MASTER = 0;
-constexpr size_t NUM_FIELDS = 4;
-
 void write_fish(std::vector<Fish> const &school, std::string const &filename) {
 	std::ofstream file(filename);
 	std::copy(

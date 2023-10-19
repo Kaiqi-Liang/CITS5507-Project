@@ -11,9 +11,6 @@
 #include "fish.hpp"
 #include "parallel.hpp"
 
-constexpr int MASTER = 0;
-constexpr size_t NUM_FIELDS = 4;
-
 int main() {
 	std::vector<Fish> send_buf;
 	int process_id, num_processes;

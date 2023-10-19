@@ -2,6 +2,9 @@
 
 #include "fish.hpp"
 
+constexpr int MASTER = 0;
+constexpr size_t NUM_FIELDS = 4;
+
 MPI_Datatype create_mpi_struct() {
 	MPI_Datatype MPI_FISH;
 	MPI_Datatype types[NUM_FIELDS];
