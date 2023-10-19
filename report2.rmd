@@ -122,7 +122,7 @@ ggplot(
 
 ### Number of Tasks Per Node
 
-In our second experiment, we investigated the impact of varying the number of tasks per nodes for 4 tasks under the MPI and combined with OpenMP implementation on the execution time of the parallelised FSB algorithm.
+In our second experiment, we investigated the impact of varying the number of tasks per nodes for 4 tasks (by setting `--ntasks=4`) under the MPI and combined with OpenMP implementation on the execution time of the parallelised FSB algorithm.
 
 We fixed the number of tasks to 4 and experimented with 1, 2, 3, 4 and 5 number of tasks per nodes which resulted in being allocated 4, 2 and 1 Setonix compute node. If we specified 3 number of tasks per node it will print the following because 4 is not divisible by 3.
 
@@ -179,7 +179,7 @@ ggplot(
   geom_point(aes(y = thread_8), shape = 24) +
   geom_line(aes(y = thread_16, color = "16")) +
   geom_point(aes(y = thread_16), shape = 25) +
-  labs(title = "Execution Time vs Number of Tasks Per Node for 4 Nodes",
+  labs(title = "Execution Time vs Number of Tasks Per Node for 4 Tasks",
     x = "Number of Tasks Per Node",
     y = "Time (s)",
     color = "Number of Threads") +
